@@ -1,0 +1,346 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+$bg-color: #EBF1F4;
+$primary-green-dark: #065446;
+$primary-green-light: #20927F;
+$primary-blue: #36526D;
+$primary-creme-light: #FCEBCF;
+$primary-creme-dark: #F0E6C1;
+$trans-green: #CDDDDA;
+$trans-creme: #FDFCF6;
+$trans-blue: #E1E5E9;
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    min-height: 100vh;
+    width: 100%;
+    background-color: $bg-color;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 400;
+}
+
+
+.light_btn{
+    background-color: $trans-green !important;
+    border-radius: 10px !important;
+    box-shadow: none;
+    text-transform: inherit;
+    white-space: nowrap;
+    border: 2px solid $primary-green-dark;
+    color: $primary-green-dark;
+    font-weight: 700;
+    font-size: 15px;
+    transition: all 0.2s;
+    &:hover{
+       background-color: $primary-green-dark !important;
+       color: white;
+    }
+}
+
+.dark_btn{
+    background-color: $primary-green-dark !important;
+    border-radius: 10px !important;
+    box-shadow: none;
+    text-transform: inherit;
+    white-space: nowrap;
+    border: 2px solid $primary-green-dark;
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    transition: all 0.2s;
+    &:hover{
+        background-color: $primary-green-light !important;
+    }
+}
+
+.login_btn{
+    @extend .light_btn;
+}
+.signup_btn{
+    @extend .dark_btn;
+}
+
+.form-container{
+    padding: 20px;
+    width: 100%;
+    max-width: 500px;
+}
+
+//===============================================================================
+// navbar
+.Navbar{
+    nav{
+        width: 100%;
+        background: white;
+        display: flex;
+        flex-direction: row;
+        position: fixed;
+        top:0;
+        left: 0;
+        color: $primary-green-light;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        overflow: visible;
+        box-shadow: none;
+        transition: all 0.2s;
+        height: min-content;
+        z-index: 3000;
+    }
+    
+    .navbar__logo{
+        font-size: 2rem;
+        margin: 0 10px;
+        font-weight: 700;
+        color: $primary-green-light;
+        transition: all 0.2s;
+    }
+    .navbar__logo:hover{
+        background-color: white;
+        color:$primary-green-dark;
+        scale: 1.1;
+    }
+    .link{
+        color: $primary-green-light;
+        transition: 0.2s all;
+    }
+    .link:hover{
+        background: $trans-green;
+        color: $primary-green-dark;
+    }
+    .link.active{
+        background-color: $primary-green-dark;
+        color: white;
+        box-shadow: 
+                    inset 0px 0px 15px 8px white,
+                    inset 0px 0px 25px 5px white,
+                    inset 0px 0px 35px 1px white;
+    }
+    .navbar__searchInput{
+        margin: 10px 0px;
+        height: min-content;
+        background-color: $trans-green;
+        display: flex;
+        border-radius: 40px;
+        padding: 5px 15px;
+        display: flex;
+        flex-direction: row ;
+        justify-content: center;
+        align-items: center;
+        margin: 0px 10px;
+        height: 45px;
+        transition: all 0.2s;
+        box-shadow: inset 0px 0px 5px 2px white;
+
+        input{
+            border: none;
+            color: $primary-green-dark;
+            padding-left: 10px;
+            margin: 0;
+        }
+        input:focus{
+            box-shadow: none !important;
+            border: none !important;
+        }
+        .search-icon{
+            color: $primary-green-light;
+        }
+        &:focus-within{
+            box-shadow: inset 0px 0px 5px 2px $primary-green-light;
+        }
+    }
+    .mid_nav{
+        flex-grow: 1;
+    }
+    .end_nav{
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    .menu-icon{
+        margin: 0px 20px;
+    }
+    .side_menu{
+        position: fixed;
+        left: 0;
+        bottom:0;
+        width: 100%;
+        height: 100%;
+        transition: all 0.2s;
+        z-index: -1;
+        .overlay{
+            background-color: rgba($primary-green-dark, 0.2);
+            transition: all 0.2s;
+            position: fixed;
+            height: 100%;
+            width: 100%;
+
+        }
+        .side_menu_content{
+            width: 50%;
+            height: 100%;
+            max-width: 400px;
+            background: white;
+            color: black;
+            transition: all 0.2s;
+            overflow: auto;
+            padding: 0px 30px;
+            padding-top: 90px;
+        }
+    }
+}
+.cart_items_count{
+    position: fixed;
+    top: 7px;
+    right: 20px;
+    min-width: 23px;
+    border-radius: 15px;
+    text-align: center;
+    z-index: 4000;
+    font-weight: 700;
+    background-color: $primary-green-light;
+    color: white;
+    box-shadow: inset 0px 0px 15px 5px rgba($trans-green, 0.6);
+}
+
+@media only screen and (max-width: 768px) {
+    .link{
+        color: white;
+    }
+}
+
+.categories_popup{
+    width: auto !important;
+    max-width: 500px;
+    overflow: auto !important;
+    max-height: 500px;
+}
+.categories_dropdown_trigger{
+    background-color: transparent !important;
+    color: $primary-green-dark;
+    box-shadow: none !important;
+    width: auto !important;
+    margin-right: 2px;
+    border-right: 2px solid $primary-green-dark;
+    text-transform: inherit;
+    font-weight: 500;
+    max-height: 40px;
+    white-space: nowrap;
+}
+
+.Store{
+    color: $primary-green-dark;
+    background: $bg-color;
+}
+
+.Page{
+    min-height: 100vh;
+    padding-top: 90px;
+}
+
+@media only screen and (max-width: 637px) {
+    .Page{
+        padding-top: 130px;
+    }
+    .Navbar .side_menu .side_menu_content {
+        padding-top: 130px;
+    }
+}
+//===============================================================================
+
+//===============================================================================
+// Login Page
+.Login{
+    @extend .Page;
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .card{
+        border-radius: 45px;
+        padding: 30px;
+    }
+    .input-field{
+        border-radius: 45px;
+        padding: 5px 10px; 
+        transition: all 0.2s;
+        box-shadow: inset 0px 0px 10px 0px $primary-creme-dark;
+        input{
+            margin-top: 0;
+            margin-bottom: 0;
+            margin-right: 20px;
+            padding-bottom:  0px;
+            box-shadow: none !important;
+            border:none !important;
+            color: $primary-green-light;
+        }
+        .helper-text{
+            font-size: 10px;
+            padding-right: 40px;
+            text-align: right;
+        }
+        &:focus-within{
+            box-shadow: inset 0px 0px 5px 2px $primary-creme-dark;
+            background-color: $trans-creme;
+            input{color: $primary-green-dark;}
+            label{color: $primary-green-light !important;}
+            .prefix{color: $primary-green-light !important;}
+            .helper-text{color: $primary-green-light !important;}
+
+        }
+
+        &.invalid{
+            box-shadow: inset 0px 0px 5px 2px red;
+            input{color: red;}
+            label{color: red !important;}
+            .prefix{color: red !important;}
+            .helper-text{color: red !important;}
+
+        }
+        &.valid{
+            box-shadow: inset 0px 0px 5px 2px white;
+            color: $primary-green-light !important;
+            background-color: $trans-green !important;
+            input{color: $primary-green-light;}
+            label{color: $primary-green-light !important;}
+            .prefix{color: $primary-green-light !important;}
+            .helper-text{color: $primary-green-light !important;}
+        }
+    }
+    .log{
+        position: relative;
+        width: 100%;
+    }
+    .log .success{
+        background-color: $trans-green;
+        color: $primary-green-dark;
+        width: max-content;
+        border-radius: 20px;
+        padding: 5px 10px;
+        animation: animateLog 5s forwards;
+        white-space: pre-wrap;
+    }
+    .log .error{
+        background-color: rgba($color: red, $alpha: 0.3);
+        width: max-content;
+        color: red;
+        border-radius: 20px;
+        padding: 5px 10px;
+        animation: animateLog 5s forwards;
+        white-space: pre-wrap;
+        font-size: 10px;
+    }
+}
+
+@keyframes animateLog{
+    0%{ opacity: 0;  }
+    10%{ opacity: 1; } 
+    90%{ opacity: 1; } 
+    100%{ opacity: 0;  }
+}
+
+//===============================================================================
