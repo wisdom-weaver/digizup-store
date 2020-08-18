@@ -8,11 +8,11 @@ function Signup(props) {
     
     const { authMessage, authError, signup, authMessageReset} = props;
 
-    const [firstName, setFirstName] = useState('Danish');
-    const [lastName, setLastName] = useState('Ansari');
-    const [email, setEmail] = useState('danish@ansari.com');
-    const [password, setPassword] = useState('danishuser');
-    const [confirmPassword, setConfirmPassword] = useState('danishuser');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     const [firstNameBlur, setFirstNameBlur] = useState(false);
     const [lastNameBlur, setLastNameBlur] = useState(false);

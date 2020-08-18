@@ -33,21 +33,20 @@ export const logoutAction = ()=>{
 
 export const signupAction = (newUser)=>{
     return (dispatch, getState, {getFirebase, getFirestore})=>{
-        console.log(getFirebase?("firebase present",getFirebase):"firebase not present")
-        console.log(getFirestore?("firestore present",getFirestore):"firestore not present")
+        
         const firebase = getFirebase();
         const firestore = getFirestore();
-        // return firebase.auth().createUserWithEmailAndPassword(newUser.email, newUser.password)
-        // .then((resp)=>{
-            // return firestore.collection('users').doc(resp.user.uid).set({
-                // firstName: newUser.firstName,
-                // lastName: newUser.lastName,
-                // email: newUser.email,
-                // initials: newUser.firstName[0]+newUser.lastName[0]
-            // })
-        // })
-        // .then(()=>{ dispatch({ type:"SIGNUP_SUCCESS" }) })
-        // .catch((err)=>{ dispatch({ type:"SIGNUP_ERROR", err:err.message }) })
+        return firebase.auth().createUserWithEmailAndPassword(newUser.email, newUser.password)
+        .then((resp)=>{
+            return firestore.collection('users').doc(resp.user.uid).set({
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                email: newUser.email,
+                initials: newUser.firstName[0]+newUser.lastName[0]
+            })
+        })
+        .then(()=>{ dispatch({ type:"SIGNUP_SUCCESS" }) })
+        .catch((err)=>{ dispatch({ type:"SIGNUP_ERROR", err:err.message }) })
     }
 }
 

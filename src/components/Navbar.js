@@ -132,8 +132,8 @@ function Navbar(props) {
                     <li><NavLink onClick={()=>{ setMenuOpenState(false) }} className="link" to="/store">Store</NavLink></li>
                     <li><NavLink onClick={()=>{ setMenuOpenState(false) }} className="nav_user_block_link" to="/account">
                     <div className="nav_user_block">
-                      <p class="line1">Hello,</p>
-                      <p class="line2">{profile?.firstName}</p>
+                      <p className="line1">Hello,</p>
+                      <p className="line2">{profile?.firstName}</p>
                     </div>
                     </NavLink></li>
                   </ul>
