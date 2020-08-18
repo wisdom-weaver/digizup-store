@@ -1,24 +1,60 @@
 import React, { useEffect } from 'react'
 import Navbar from '../components/Navbar'
-import $ from 'jquery';
+
+import $ from 'jquery'
 import M from 'materialize-css';
+import { Dropdown, Button, Divider, Icon } from "react-materialize";
 
 function Store() {
     useEffect(()=>{
-        document.addEventListener('DOMContentLoaded', function() {
-            var elems = document.querySelectorAll('.dropdown-trigger');
-            var instances = M.Dropdown.init(elems, {});
-          });
+        
     },[]);
-    const categories = ['All', 'Electronics', 'Stationery', 'Computers', 'Edibles'];
-    const html = categories.map(each=>( <li>{each}</li> ) );
     
     return (
         <div className="Store Page">
             <h1>Store</h1>
-            <ul>{
-                html
-            }</ul>
+            <Dropdown
+              id="Dropdown_6"
+              options={{
+                alignment: 'left',
+                autoTrigger: true,
+                closeOnClick: true,
+                constrainWidth: true,
+                container: null,
+                coverTrigger: true,
+                hover: false,
+                inDuration: 150,
+                onCloseEnd: null,
+                onCloseStart: null,
+                onOpenEnd: null,
+                onOpenStart: null,
+                outDuration: 250
+              }}
+              trigger={<Button node="button">Drop Me!</Button>}
+            >
+              <a href="#">
+                one
+              </a>
+              <a href="#">
+                two
+              </a>
+              <Divider />
+              <a href="#">
+                three
+              </a>
+              <a href="#">
+                <Icon>
+                  view_module
+                </Icon>
+                four
+              </a>
+              <a href="#">
+                <Icon>
+                  cloud
+                </Icon>
+                {' '}five
+              </a>
+            </Dropdown>
         </div>
     )
 }

@@ -24,6 +24,9 @@ body{
     font-weight: 400;
 }
 
+.light_text{ font-weight: 300; }
+.regular_text{ font-weight: 500; }
+.heavy_text{ font-weight: 700; }
 
 .light_btn{
     background-color: $trans-green !important;
@@ -36,6 +39,7 @@ body{
     font-weight: 700;
     font-size: 15px;
     transition: all 0.2s;
+    margin: 5px;
     &:hover{
        background-color: $primary-green-dark !important;
        color: white;
@@ -53,6 +57,7 @@ body{
     font-weight: 700;
     font-size: 15px;
     transition: all 0.2s;
+    margin: 5px;
     &:hover{
         background-color: $primary-green-light !important;
     }
@@ -83,7 +88,7 @@ body{
         top:0;
         left: 0;
         color: $primary-green-light;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
         flex-wrap: wrap;
         overflow: visible;
@@ -121,6 +126,51 @@ body{
                     inset 0px 0px 25px 5px white,
                     inset 0px 0px 35px 1px white;
     }
+    .nav_user_block_link{
+        transition: all 0.2s;
+        border-radius: 30px;
+        padding: 3px;
+        box-shadow: inset 0px 0px 15px 1px white;
+    }
+    .nav_user_block_link:hover{
+        background: $primary-green-dark;
+
+    }
+    .nav_user_block{
+        display: flex;
+        flex-direction: column;
+        color: black;
+        background: $primary-creme-light;
+        color: $primary-green-dark;
+        border-radius: 40px;;
+        align-items: center;
+        width: 70px;
+        box-shadow: 
+                    inset 0px 0px 5px 1px white;
+        padding: 10px;
+        .line1{
+            margin: 0;
+            padding: 0;
+            line-height: 25px;
+            font-size: 10px;
+            font-weight: 700;
+            width: 100%;
+            text-align: right;
+        }
+        .line2{
+            margin: 0;
+            padding: 0;
+            line-height: 15px;
+            font-size: 15px;
+            font-weight: 300;;
+            width: 100%;
+            text-align: left;
+        }
+    }
+
+    .navbar__searchInput_container{
+        flex-grow: 1;
+    }
     .navbar__searchInput{
         margin: 10px 0px;
         height: min-content;
@@ -136,7 +186,7 @@ body{
         height: 45px;
         transition: all 0.2s;
         box-shadow: inset 0px 0px 5px 2px white;
-
+        flex-grow: 1;
         input{
             border: none;
             color: $primary-green-dark;
@@ -153,13 +203,6 @@ body{
         &:focus-within{
             box-shadow: inset 0px 0px 5px 2px $primary-green-light;
         }
-    }
-    .mid_nav{
-        flex-grow: 1;
-    }
-    .end_nav{
-        width: 100%;
-        margin-bottom: 8px;
     }
     .menu-icon{
         margin: 0px 20px;
@@ -187,10 +230,45 @@ body{
             background: white;
             color: black;
             transition: all 0.2s;
-            overflow: auto;
-            padding: 0px 30px;
+            overflow: hidden;
+            padding: 0px 0px;
             padding-top: 90px;
+            padding-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
         }
+        .overlayLinkContainer{
+            
+        }
+        .overlayLink{
+            color: $primary-green-dark;
+            padding: 2px 10px;
+            
+        }
+        .overlayLink.active{
+            background-color: $primary-green-dark;
+            color: white;
+            border-radius: 40px;
+            box-shadow: 
+                    inset 0px 0px 15px 2px white,
+                    
+        }
+        .overlay_top_container{
+            flex-grow: 1;
+            width: 100%;
+            overflow: auto
+        }
+        .overlay_bottom_container{
+            display: flex;    
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            max-height: 15vh;
+        }
+
     }
 }
 .cart_items_count{
@@ -239,7 +317,7 @@ body{
 
 .Page{
     min-height: 100vh;
-    padding-top: 90px;
+    padding-top: 60px;
 }
 
 @media only screen and (max-width: 637px) {
@@ -249,12 +327,26 @@ body{
     .Navbar .side_menu .side_menu_content {
         padding-top: 130px;
     }
+    .Navbar nav {
+        justify-content: space-between;
+    }
+    .Navbar nav .navbar__searchInput_container{
+        position: fixed;
+        top: 65px;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding-bottom: 10px;
+    }
+    .Navbar nav .navbar__searchInput{
+        
+    }
 }
 //===============================================================================
 
 //===============================================================================
-// Login Page
-.Login{
+// Login Page and Signup Page
+.Login, .Signup{
     @extend .Page;
     min-height: 70vh;
     display: flex;
@@ -262,13 +354,22 @@ body{
     align-items: center;
     .card{
         border-radius: 45px;
-        padding: 30px;
+        padding: 5px 20px;
+    }
+    .card-title{
+        width: 100%;
+        text-align: center;
+        color: $primary-green-dark;
+    }
+    .card-content{
+        padding:0px 5px;
     }
     .input-field{
         border-radius: 45px;
-        padding: 5px 10px; 
+        padding: 3px 10px; 
         transition: all 0.2s;
         box-shadow: inset 0px 0px 10px 0px $primary-creme-dark;
+        overflow: hidden;
         input{
             margin-top: 0;
             margin-bottom: 0;
@@ -277,12 +378,23 @@ body{
             box-shadow: none !important;
             border:none !important;
             color: $primary-green-light;
+            background-color: transparent !important;
+            border-radius: 5px;;
+        }
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            transition: background-color 5000s ease-in-out 0s;
         }
         .helper-text{
             font-size: 10px;
             padding-right: 40px;
             text-align: right;
         }
+        .prefix{color: $primary-creme-dark !important;}
+
+
         &:focus-within{
             box-shadow: inset 0px 0px 5px 2px $primary-creme-dark;
             background-color: $trans-creme;
@@ -314,6 +426,7 @@ body{
     .log{
         position: relative;
         width: 100%;
+        min-height: 20px;
     }
     .log .success{
         background-color: $trans-green;

@@ -93,7 +93,10 @@ function Login(props) {
         <div className="Login">
             <div className="form-container">
                 <div className="card">
-                    <div className="card-title">Login</div>
+                <div className="card-title">
+                        <span className="light_text">Log</span>
+                        <span className="heavy_text">In</span>
+                    </div>
                     <div className="card-content">
                     <div className="log center">
                         {renderLog}

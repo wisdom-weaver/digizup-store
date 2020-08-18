@@ -10,6 +10,8 @@ export const authReducer = (state=initState, action)=>{
         case 'LOGIN_ERROR': return {authMessage: action.type, authError: action.err};
         case 'LOGOUT_SUCCESS': return {authMessage: action.type, authError: null};
         case 'LOGOUT_ERROR': return {authMessage: action.type, authError: action.err};
+        case 'SIGNUP_SUCCESS': return {authMessage: action.type, authError: null};
+        case 'SIGNUP_ERROR': return {authMessage: action.type, authError: action.err};
         case 'AUTH_MESSAGE_RESET': return initState;
         default: return state;
     }
