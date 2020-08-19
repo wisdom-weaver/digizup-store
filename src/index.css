@@ -27,6 +27,42 @@ body {
   font-weight: 700;
 }
 
+.bg-color-text {
+  color: #EBF1F4;
+}
+
+.primary-green-dark-text {
+  color: #065446;
+}
+
+.primary-green-light-text {
+  color: #20927F;
+}
+
+.primary-blue-text {
+  color: #36526D;
+}
+
+.primary-creme-light-text {
+  color: #FCEBCF;
+}
+
+.primary-creme-dark-text {
+  color: #F0E6C1;
+}
+
+.trans-green-text {
+  color: #CDDDDA;
+}
+
+.trans-creme-text {
+  color: #FDFCF6;
+}
+
+.trans-blue-text {
+  color: #E1E5E9;
+}
+
 .light_btn, .login_btn {
   background-color: #CDDDDA !important;
   border-radius: 10px !important;
@@ -386,14 +422,9 @@ body {
   white-space: nowrap;
 }
 
-.Store {
-  color: #065446;
-  background: #EBF1F4;
-}
-
 .Page, .Login, .Signup {
   min-height: 100vh;
-  padding-top: 60px;
+  padding-top: 5.5rem;
 }
 
 @media only screen and (max-width: 637px) {
@@ -617,5 +648,39 @@ body {
   100% {
     opacity: 0;
   }
+}
+
+.Store {
+  background: #EBF1F4;
+}
+
+.ProductCard .card-image {
+  max-height: 240px;
+  max-width: 240px;
+  padding: 20px;
+}
+
+.ProductCard .card-image img {
+  max-height: 200px;
+  max-width: 200px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.ProductCard .product-productName {
+  color: black;
+}
+
+.ProductCard .product-price {
+  color: #065446;
+}
+
+.ProductCard .product-rating {
+  font-size: 10px;
+}
+
+.ProductCard .product-rating .rating-numbers {
+  font-size: 15px;
+  color: #065446;
 }
 /*# sourceMappingURL=index.css.map */
