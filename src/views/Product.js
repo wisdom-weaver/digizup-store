@@ -11,7 +11,7 @@ import { v1 as uuid } from "uuid";
 
 function Product(props) {
     const {productid} = props.match.params;
-    var {productOption} = queryString.parse(props.location.search)
+    const [productOption, setProductOption] = useState(queryString.parse(props?.location?.search)?.productOption);
     
     const history = useHistory();
 
@@ -19,13 +19,31 @@ function Product(props) {
         {collection: 'products', doc: productid}
     ])
     const product = useSelector(({firestore:{data}})=> data.products && data.products[productid] )
-    var [optionsIndexArray, setOptionsIndexArray] = useState(false);
+    const [optionsIndexArray, setOptionsIndexArray] = useState(false);
     const [renderedProduct, setRenderedProduct] = useState(false);
     
+    const toOptionIndexArray = (optionString)=>{
+        return optionString?.split('_').slice(1);
+    }
+    const toOptionString = (array)=>{
+        return "option"+array?.reduce((acum, each)=> acum+="_"+each, '');
+    }
+
+
+    useEffect(()=>{
+        if(!productOption) return;
+        var proopar = toOptionIndexArray(productOption) ;
+        history.push('/product/'+productid+"?productOption="+productOption);
+        setOptionsIndexArray(proopar);
+    },[productOption])
     useEffect(()=>{ 
         if(!product) return;
         console.log('product',product);
-        setOptionsIndexArray(productOption.split('_').slice(1));
+        if(product.options){
+            setRenderedProduct(product)
+        }else{
+            setOptionsIndexArray(toOptionIndexArray(productOption));
+        }
 
     },[product])
     useEffect(()=>{
@@ -46,7 +64,7 @@ function Product(props) {
         if(!options){ return product;}
 
         if( options && !productOption){
-            productOption = "option"+Array(options.length).fill().reduce((acum, each)=> acum+="_0", '');
+            // productOption = "option"+Array(options.length).fill().reduce((acum, each)=> acum+="_0", '');
             history.push('/product/'+productid+'?productOption='+productOption);
         }
         console.log('productOption',productOption);
@@ -86,6 +104,15 @@ function Product(props) {
       )
     }
 
+    const selectOption = (eachOptionIndex,eachOptionElementIndex)=>{
+        var newArr = optionsIndexArray;
+        newArr[eachOptionIndex] = eachOptionElementIndex;
+        console.log(newArr);
+        var newProductOption = toOptionString(newArr);
+        console.log(newProductOption);
+        setProductOption(newProductOption);
+    }
+
     const renderedProductJSX = renderedProduct && (
         <div className="row product-row-1">
            <div className="col s12 m4">
@@ -107,11 +134,12 @@ function Product(props) {
                                     <p className="primary-green-light-text">{eachOption} : </p>
                                     {
                                         product[eachOption].map((eachOptionElement,eachOptionElementIndex) => {
-                                            console.log(eachOption, eachOptionIndex, eachOptionElement, eachOptionElementIndex, optionsIndexArray);
                                             if(optionsIndexArray[eachOptionIndex] == eachOptionElementIndex){
                                                 return (<div className="btn btn-small product-each-option-element active">{eachOptionElement.optionName}</div>)
                                             }else{
-                                                return (<div className="btn btn-small product-each-option-element">{eachOptionElement.optionName}</div>)
+                                                return (<div 
+                                                onClick={()=>{ selectOption(eachOptionIndex, eachOptionElementIndex) }}
+                                                className="btn btn-small product-each-option-element">{eachOptionElement.optionName}</div>)
                                             }
                                         })
                                     }
@@ -166,6 +194,7 @@ function Product(props) {
 
     return (
         <div className='Product Page'>
+        <button onClick={()=>{setProductOption('option_0_0')}} >{productOption}</button>
             <div className="container">
                 {(renderedProduct)
                 ?( renderedProductJSX )
