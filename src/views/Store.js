@@ -30,12 +30,22 @@ function Store(props) {
                 productName: product[each].productFullName,
                 price: product[each].price,
                 defaultImage: product[each].images[0],
-                rating: 4.2
+                rating: 4.2,
+                id: product.id,
+                option: each
               }
               renderableProducts.push(productForCard);
             })
           }else{
-
+            var productForCard = {
+              productName: product.productName,
+              price: product.price,
+              defaultImage: product.images[0],
+              rating: 4.2,
+              id: product.id,
+              option: false
+            }
+            renderableProducts.push(productForCard);
           }
          })
        }else{
@@ -49,7 +59,7 @@ function Store(props) {
             <div className="products-container container">
               {
                 exportProducts?(
-                  exportProducts.map(eachProduct=>(<ProductCard product={eachProduct} />))
+                  exportProducts.map(eachProduct=>(<ProductCard key={uuid()} product={eachProduct} />))
                 ):( <p>no products found</p> )
               }
             </div>

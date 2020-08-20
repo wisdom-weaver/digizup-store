@@ -4,9 +4,15 @@ import M from 'materialize-css';
 import 'materialize-css';
 import { Card, CardTitle, Icon } from 'react-materialize';
 import CurrencyFormat from 'react-currency-format';
+import { useHistory } from 'react-router-dom';
+
+import { v1 as uuid } from 'uuid';
 
 function ProductCard({product}) {
-    const {productName, price, defaultImage, rating} = product;
+    const {productName, id, option, price, defaultImage, rating} = product;
+    
+    const history= useHistory();
+    
     const numberFormat = (value) =>
       new Intl.NumberFormat('en-IN', {
         style: 'currency',
@@ -23,9 +29,16 @@ function ProductCard({product}) {
         </h5>
       )
     }
+
+    const redirectToProductPage = ()=>{
+      var target = '/product/'+id+(option?("?productOption="+option):(''))
+      history.push(target);
+    }
+
     return (
         <div className="ProductCard">
-            <Card
+            <Card 
+              onClick={redirectToProductPage}
               header={<CardTitle image={defaultImage} />}
               horizontal
             >
@@ -34,8 +47,8 @@ function ProductCard({product}) {
               {priceFormat(price)}
               
               <div className="product-rating">
-                  {Array(Math.round(rating)).fill().map((_)=>(<span>🌟</span>))} 
-                  {Array(5-Math.round(rating)).fill().map((_)=>(<span>★</span>))} 
+                  {Array(Math.round(rating)).fill().map((_)=>(<span key={uuid()} >🌟</span>))} 
+                  {Array(5-Math.round(rating)).fill().map((_)=>(<span  key={uuid()} >★</span>))} 
                   <span className="rating-numbers">{" "+rating} rating</span>
               </div>
             </Card>

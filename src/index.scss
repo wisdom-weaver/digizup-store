@@ -24,6 +24,13 @@ body{
     font-weight: 400;
 }
 
+.line-break{
+    white-space: pre-wrap;
+    position: relative;
+    width: 100%;
+    object-fit: contain
+}
+
 .light_text{ font-weight: 300; }
 .regular_text{ font-weight: 500; }
 .heavy_text{ font-weight: 700; }
@@ -78,6 +85,21 @@ body{
 }
 .signup_btn{
     @extend .dark_btn;
+}
+
+.trans-green-btn{
+    background: rgba($primary-green-dark, 0.2);
+    color: $primary-green-dark;
+    box-shadow: none !important;
+    &:hover{
+        background: rgba($primary-green-dark, 1);
+        color: white;
+        transition: all 0.2;
+    }
+    &.active{
+        background: rgba($primary-green-dark, 0.8);
+        color: white;
+    }
 }
 
 .form-container{
@@ -471,8 +493,8 @@ body{
 
 .ProductCard{
     .card-image{
-        max-height: 240px;
-        max-width: 240px;
+        height: 240px;
+        width: 240px;
         padding:20px;
         img{
             max-height: 200px;
@@ -496,4 +518,33 @@ body{
 }
 
 //===============================================================================
+
+.Product{
+    img{
+        width: 100%;
+        position: sticky;
+        top: 130px;
+        left: 0;
+        object-fit: contain;
+    }
+    .product-price{
+        color: $primary-green-dark;
+        font-weight: 700;
+    }
+    .product-features-section,
+    .product-description-section,
+    .product-specs-section{
+        margin-bottom: 20px;
+        p{
+            padding-bottom: 20px;
+        }
+    }
+    .product-each-option-element{
+        @extend .trans-green-btn;
+        font-size: 15px !important;
+        text-transform: inherit !important;
+        margin: 2px 6px !important;
+        border-radius: 15px;
+    }
+}
 
