@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useHistory } from 'react-router-dom'
 import {v1 as uuid} from 'uuid';
 import { connect } from 'react-redux';
 
@@ -14,10 +14,27 @@ import { Dropdown, Button, Divider, Collapsible, CollapsibleItem, Icon } from "r
 import { firebaseConnect, firestoreConnect } from 'react-redux-firebase';
 import { compose } from 'redux';
 import { logoutAction } from '../store/actions/authActions';
+import { searchAction, searchResetAction } from '../store/actions/searchActions';
 
+import _ from 'lodash'
 
 function Navbar(props) {
-    const {categories,auth,profile, logout} = props ;
+    const { auth,profile, logout, search, searchReset} = props ;
+    const [categories, setCategories] = useState(null);
+    useEffect(()=>{
+      if(!props?.categories) return;
+      console.log(props.categories);
+      var sortedCategories = props.categories;
+      var allCategory = sortedCategories.filter(each=>(each.title =='All'));
+      sortedCategories = _.orderBy( sortedCategories, ['title'], ['asc']);
+      sortedCategories = sortedCategories.filter(each=>each.title!='All');
+      sortedCategories = allCategory.concat(sortedCategories);
+      console.log(sortedCategories);
+      setCategories(sortedCategories);
+    },[props.categories])
+    
+    
+    const history = useHistory()
 
     const [menuOpenState, setMenuOpenState] = useState(false);
     const [category, setCategory] = useState('All');
@@ -63,8 +80,10 @@ function Navbar(props) {
     },[])
 
     const submitSearch = ()=>{
-      //console.log(category, searchTerm);
-      setSearchTerm('');
+      console.log(category, searchTerm);
+      searchReset();
+      search(searchTerm, category);
+      history.push('/store');
     }
 
     const dropdown_inner_html =  categories?.map( eachcategory=> ( <a key={uuid()} onClick={()=>{setCategory(eachcategory?.title)}}>{eachcategory?.title}</a> ) );
@@ -236,7 +255,9 @@ const mapStateToProps = (state)=>{
 
 const mapDispatchToProps = (dispatch)=>{
   return {
-    logout: ()=>{ dispatch( logoutAction() ) }
+    logout: ()=>{ dispatch( logoutAction() ) },
+    search: (searchTerm, category)=>{ dispatch( searchAction(searchTerm,category) ) },
+    searchReset: ()=>{ dispatch( searchResetAction() ) }
   }
 }
 

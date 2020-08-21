@@ -681,6 +681,10 @@ body {
   background: #EBF1F4;
 }
 
+.ProductCard {
+  cursor: pointer;
+}
+
 .ProductCard .card-image {
   height: 240px;
   width: 240px;

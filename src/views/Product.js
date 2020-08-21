@@ -46,7 +46,7 @@ function Product(props) {
     useEffect(()=>{ 
         if(!product) return;
         // console.log('product',product);
-        if(product.options){
+        if(product.optionCategories){
             setOptionsIndexArray(toOptionIndexArray(productOption));
         }else{
             setRenderedProduct(product)
@@ -67,7 +67,7 @@ function Product(props) {
 
     const getRenderableProduct = ()=>{
         if(!product) return;
-        var options = product?.options;
+        var options = product?.optionCategories;
         if(!options){ return product;}
 
         if( options && !productOption){
@@ -77,9 +77,9 @@ function Product(props) {
             setProductOption(productOption_def);
         }
         if(!optionsIndexArray) return;
-        var allOptionSpecs = optionsIndexArray?.reduce((acc ,optionIndex, index)=>  ({...acc, ...product[product.options[index]][optionIndex]?.optionSpecs}) , {});
+        var allOptionSpecs = optionsIndexArray?.reduce((acc ,optionIndex, index)=>  ({...acc, ...product[product.optionCategories[index]][optionIndex]?.optionSpecs}) , {});
         var allOptionFeatures = optionsIndexArray?.reduce((acc ,optionIndex, index)=>  {
-            var optionFeatures = product[product.options[index]][optionIndex]?.optionFeatures;
+            var optionFeatures = product[product.optionCategories[index]][optionIndex]?.optionFeatures;
             if(!optionFeatures) return acc;
             return acc.concat(optionFeatures)
         } , []);
@@ -165,10 +165,10 @@ function Product(props) {
                 <h5 className="primary-green-light-text light_text">{renderedProduct.productName}</h5>
                 {priceFormat(renderedProduct.price)}
                 {
-                    (product.options)?(
+                    (product.optionCategories)?(
                         <div className="product-options-section">
                             { 
-                                product.options.map((eachOption,eachOptionIndex)=>(
+                                product.optionCategories.map((eachOption,eachOptionIndex)=>(
                                 <div key={uuid()} className="product-each-option-container">
                                     <p className="primary-green-light-text">{eachOption} : </p>
                                     {
