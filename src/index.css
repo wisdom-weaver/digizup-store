@@ -711,6 +711,14 @@ body {
   color: #065446;
 }
 
+.Product .product-image-container {
+  margin-top: 25px;
+  padding: 10px;
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+}
+
 .Product img {
   width: 100%;
   position: -webkit-sticky;
@@ -743,5 +751,109 @@ body {
   text-transform: inherit !important;
   margin: 2px 6px !important;
   border-radius: 15px;
+}
+
+.Product .product-quantity-selection {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 5px 10px;
+}
+
+.Product .cart-quantity-input {
+  max-width: 50px;
+  text-align: center;
+  border: none !important;
+  margin: 0px !important;
+  padding: 0 !important;
+}
+
+.Product .quantity-adjustment-btn {
+  background: transparent;
+  -webkit-box-shadow: none !important;
+          box-shadow: none !important;
+  margin: 0px !important;
+  padding: 0 !important;
+}
+
+.Product .quantity-adjustment-btn i {
+  color: #065446;
+  font-size: 30px;
+}
+
+.Product .add-to-cart-btn {
+  background: #065446 !important;
+  text-transform: inherit;
+  margin-left: 20px;
+  border-radius: 15px;
+}
+
+.Product .quantity-selection-container {
+  background: rgba(6, 84, 70, 0.2);
+  padding: 0 !important;
+  margin: 2px 2px;
+  border-radius: 40px;
+}
+
+.btn::-moz-selection,
+i::-moz-selection {
+  background: inherit;
+  color: inherit;
+}
+
+.btn::selection,
+i::selection {
+  background: inherit;
+  color: inherit;
+}
+
+p::-moz-selection,
+div::-moz-selection,
+li::-moz-selection,
+span::-moz-selection,
+h1::-moz-selection,
+h2::-moz-selection,
+h3::-moz-selection,
+h4::-moz-selection,
+h5::-moz-selection,
+h6::-moz-selection,
+sub::-moz-selection,
+sup::-moz-selection,
+table::-moz-selection,
+tr::-moz-selection,
+td::-moz-selection,
+th::-moz-selection {
+  background: rgba(6, 84, 70, 0.6);
+  color: white;
+}
+
+p::selection,
+div::selection,
+li::selection,
+span::selection,
+h1::selection,
+h2::selection,
+h3::selection,
+h4::selection,
+h5::selection,
+h6::selection,
+sub::selection,
+sup::selection,
+table::selection,
+tr::selection,
+td::selection,
+th::selection {
+  background: rgba(6, 84, 70, 0.6);
+  color: white;
 }
 /*# sourceMappingURL=index.css.map */

@@ -520,6 +520,14 @@ body{
 //===============================================================================
 
 .Product{
+
+    .product-image-container{
+        margin-top: 25px;
+        padding: 10px;
+        width: 100%;
+        background: white;
+        border-radius: 20px;
+    }
     img{
         width: 100%;
         position: sticky;
@@ -546,5 +554,67 @@ body{
         margin: 2px 6px !important;
         border-radius: 15px;
     }
+    .product-quantity-selection{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding:5px 10px;
+    }
+    .cart-quantity-input{
+        max-width: 50px;
+        text-align: center;
+        border: none !important;
+        margin: 0px !important;
+        padding: 0 !important;
+    }
+    .quantity-adjustment-btn{
+        background: transparent;
+        box-shadow: none !important;
+        margin: 0px !important;
+        padding: 0 !important;
+        i{
+            color: $primary-green-dark;
+            font-size: 30px;
+        }
+    }
+    .add-to-cart-btn{
+        background: $primary-green-dark !important;
+        text-transform: inherit;
+        margin-left: 20px;
+        border-radius: 15px;
+    }
+    .quantity-selection-container{
+        background: rgba($primary-green-dark, 0.2);
+        padding:0 !important;
+        margin: 2px 2px;
+        border-radius: 40px;
+    }
 }
 
+.btn::selection,
+i::selection
+{
+    background: inherit;
+    color: inherit;
+}
+p::selection,
+div::selection,
+li::selection,
+span::selection,
+h1::selection,
+h2::selection,
+h3::selection,
+h4::selection,
+h5::selection,
+h6::selection,
+sub::selection,
+sup::selection,
+table::selection,
+tr::selection,
+td::selection,
+th::selection
+{
+    background: rgba($primary-green-dark, 0.6);
+    color: white;
+}
