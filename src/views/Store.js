@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
-
 import $ from 'jquery'
 import M from 'materialize-css';
 import { Dropdown, Button, Divider, Icon } from "react-materialize";
@@ -9,17 +8,28 @@ import { compose } from 'redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import ProductCard from '../components/ProductCard';
 import {v1 as uuid } from 'uuid';
+import queryString from 'query-string'
+import { withRouter } from 'react-router-dom';
+import { searchAction, searchResetAction } from '../store/actions/searchActions';
+
 
 function Store(props) {
-    const {search, products, isLoaded} = props;
-    const {searchError, searchResults, searchTerm, searchMessage} = search;
+    // console.log('props', props);
+    var query = queryString.parse(props?.location?.search)
+    const searchTerm =query?.searchTerm ?? ''; 
+    const category =query?.category ?? 'All'; 
+    // console.log('seachTerm form store page', searchTerm);
+    const {search, searchAction, searchReset} = props;
+    const {searchError, searchResults, searchMessage} = search;
     useEffect(()=>{
-      // console.log('search',search);
-    },[search])
+      searchReset();
+      searchAction(searchTerm,category);
+    },[searchTerm,category])
     
     return (
         <div className="Store Page">
             <div className="products-container container">
+              
               {searchResults && searchResults.map(product=>( 
                 <ProductCard key={uuid()} product={product} /> 
               ))}
@@ -27,13 +37,17 @@ function Store(props) {
                 (searchMessage == 'SEARCH_RESULTS_NOT_FOUND')
                 ?( <p>{searchError}</p> ):null
               }
+              {
+                (searchMessage == 'SEARCH_RESET' )
+                ?( <p>Loading...</p> ):null
+              }
             </div>
         </div>
     )
 }
 
 const mapStateToProps = (state)=>{
-  console.log(state);
+  // console.log(state);
   return {
     search: state.search,
     products: state.firestore.ordered.products,
@@ -41,10 +55,16 @@ const mapStateToProps = (state)=>{
   }
 }
 
+const mapDispatchToProps = (dispatch)=>{
+  return {
+    searchAction: (searchTerm, category)=>{ dispatch( searchAction(searchTerm,category) ) },
+    searchReset: ()=>{ dispatch( searchResetAction() ) }
+  }
+}
+
 export default compose(
-  firestoreConnect([
-    { collection : 'products' }
-  ]),
-  connect(mapStateToProps, null)
+  connect(mapStateToProps, mapDispatchToProps),
+  withRouter  
 )
 (Store)
+

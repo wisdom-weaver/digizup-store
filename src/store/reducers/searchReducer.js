@@ -13,7 +13,7 @@ export const searchReducer = (state = initState, action)=>{
         case 'SEARCH_RESULTS_NOT_FOUND': 
             return {searchTerm: action.searchTerm, searchResults: null, searchError:action.err, searchMessage: action.type };
         case 'SEARCH_RESET' :
-            return {...state, searchMessage:action.type};
+            return {...initState, searchMessage:action.type};
         default: return state;
     }
 }
