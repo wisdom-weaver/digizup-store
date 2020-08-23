@@ -76,12 +76,8 @@ function Navbar(props) {
     },[menuOpenState])
     
     useEffect(()=>{
-      document.addEventListener('DOMContentLoaded', function() {
-        var trigger1 = document.querySelectorAll('.dropdown-trigger1');
-        var instance1 = M.Dropdown.init(trigger1, {});
-        var collapsibleElems = document.querySelectorAll('.collapsible');
-        var collapsibleInstances = M.Collapsible.init(collapsibleInstances, {});
-      });
+      $('link').click(()=>{ console.log('link Click'); setMenuOpenState(false)})
+      $('ovelayLink').click(()=>{ console.log('link Click');; setMenuOpenState(false)})
       window.addEventListener("resize", updateWidthAndHeight);
       return () => window.removeEventListener("resize", updateWidthAndHeight);
     },[])
@@ -133,11 +129,11 @@ function Navbar(props) {
       </div>
       </div>
     )
-    const sideNavCategoryLinks_html =  categories?.map( eachcategory=> (<div key={uuid()} className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to={"/store/"+eachcategory?.urlid}>{eachcategory?.title}</NavLink></div>) );
+    const sideNavCategoryLinks_html =  categories?.map( eachcategory=> (<div key={uuid()} className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to={"/store/"+eachcategory?.urlid}>{eachcategory?.title}</NavLink></div>) );
 
     return (
         <div className="Navbar">
-          <NavLink onClick={()=>{ setMenuOpenState(false) }} className="link cart-link" to="/cart"> 
+          <NavLink onClick={()=>{setMenuOpenState(false)}} className="link cart-link" to="/cart"> 
             <span className="cart_items_count">22</span>
           </NavLink>
           <nav>
@@ -149,7 +145,7 @@ function Navbar(props) {
                   (<Close className="menu-icon" />)
                 }
               </span>
-              <NavLink onClick={()=>{ setMenuOpenState(false) }} exact to="/">
+              <NavLink onClick={()=>{setMenuOpenState(false)}} exact to="/">
                 <span className="navbar__logo">Digizup</span>
                 {/* <span>{width}x{height}</span> */}
               </NavLink>
@@ -160,8 +156,8 @@ function Navbar(props) {
               {
                 (auth?.uid)?(
                   <ul className="hide-on-med-and-down">
-                    <li><NavLink onClick={()=>{ setMenuOpenState(false) }} className="link" to="/store">Store</NavLink></li>
-                    <li><NavLink onClick={()=>{ setMenuOpenState(false) }} className="nav_user_block_link" to="/account">
+                    <li><NavLink onClick={()=>{setMenuOpenState(false)}} className="link" to="/store">Store</NavLink></li>
+                    <li><NavLink onClick={()=>{setMenuOpenState(false)}} className="nav_user_block_link" to="/account">
                     <div className="nav_user_block">
                       <p className="line1">Hello,</p>
                       <p className="line2">{profile?.firstName}</p>
@@ -170,15 +166,15 @@ function Navbar(props) {
                   </ul>
                 ):(
                   <ul className="hide-on-med-and-down">
-                    <li><NavLink onClick={()=>{ setMenuOpenState(false) }} className="link" to="/store">Store</NavLink></li>
-                    <li><NavLink onClick={()=>{ setMenuOpenState(false) }} className="btn login_btn" to="/login">Login</NavLink></li>
-                    <li><NavLink onClick={()=>{ setMenuOpenState(false) }} className="btn signup_btn" to="/signup">Signup</NavLink></li>
+                    <li><NavLink onClick={()=>{setMenuOpenState(false)}} className="link" to="/store">Store</NavLink></li>
+                    <li><NavLink onClick={()=>{setMenuOpenState(false)}} className="btn login_btn" to="/login">Login</NavLink></li>
+                    <li><NavLink onClick={()=>{setMenuOpenState(false)}} className="btn signup_btn" to="/signup">Signup</NavLink></li>
                   </ul>
                 )
               }
 
               <ul>
-                <li><NavLink onClick={()=>{ setMenuOpenState(false) }} className="link cart-link" to="/cart"> 
+                <li><NavLink onClick={()=>{setMenuOpenState(false)}} className="link cart-link" to="/cart"> 
                   <Cart style={{ fontSize: 40, marginTop: 12 }} /> 
                 </NavLink></li>
               </ul>
@@ -201,10 +197,10 @@ function Navbar(props) {
                       icon={<Icon>account_box</Icon>}
                       node="div"
                     >
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to="/account">Dashboard</NavLink></div>
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to="/account/orders">My Orders</NavLink></div>
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to="/account/addresses">My Addresses</NavLink></div>
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to="/account/paymentoptions">Payment Options</NavLink></div>
+                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/account">Dashboard</NavLink></div>
+                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/account/orders">My Orders</NavLink></div>
+                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/account/addresses">My Addresses</NavLink></div>
+                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/account/paymentoptions">Payment Options</NavLink></div>
                       
                     </CollapsibleItem>
                     ):(null)}
@@ -214,8 +210,8 @@ function Navbar(props) {
                       icon={<Icon>place</Icon>}
                       node="div"
                     >
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to="/store">Visit Store</NavLink></div>
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to="/cart">My Cart</NavLink></div>
+                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/store">Visit Store</NavLink></div>
+                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/cart">My Cart</NavLink></div>
                       {sideNavCategoryLinks_html}
 
                     </CollapsibleItem>
@@ -225,11 +221,11 @@ function Navbar(props) {
                       icon={<Icon>whatshot</Icon>}
                       node="div"
                     >
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to="/">Home</NavLink></div>
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to="/about">About Us</NavLink></div>
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to="/reviews">Reviews</NavLink></div>
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to="/termsconditions">Terms & Conditions</NavLink></div>
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{ setMenuOpenState(false) }} className="overlayLink" exact to="/privacy">Privacy Statement</NavLink></div>
+                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/">Home</NavLink></div>
+                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/about">About Us</NavLink></div>
+                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/reviews">Reviews</NavLink></div>
+                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/termsconditions">Terms & Conditions</NavLink></div>
+                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/privacy">Privacy Statement</NavLink></div>
                       
                     </CollapsibleItem>
                   </Collapsible>
@@ -243,8 +239,8 @@ function Navbar(props) {
                         </div>
                     ):(
                       <div className="overlay_bottom_container">
-                        <div><NavLink onClick={()=>{ setMenuOpenState(false) }} to="/login" className="btn login_btn" >Login</NavLink></div>
-                        <div><NavLink onClick={()=>{ setMenuOpenState(false) }} to="/signup" className="btn signup_btn" >Signup</NavLink></div>
+                        <div><NavLink onClick={()=>{setMenuOpenState(false)}} to="/login" className="btn login_btn" >Login</NavLink></div>
+                        <div><NavLink onClick={()=>{setMenuOpenState(false)}} to="/signup" className="btn signup_btn" >Signup</NavLink></div>
                       </div>
                     )
                   }

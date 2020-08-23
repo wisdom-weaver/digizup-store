@@ -391,14 +391,22 @@ th::selection
     min-height: 100vh;
     padding-top: 5.5rem;
     margin-bottom: 10rem;
+    .top-popup{
+        position: sticky;
+        top: 5.5rem;
+    }
 }
 
 @media only screen and (max-width: 637px) {
     .Page{
-        padding-top: 130px;
+        padding-top: 10rem;
+        .top-popup{
+            position: sticky;
+            top:10.5rem;
+        }
     }
     .Navbar .side_menu .side_menu_content {
-        padding-top: 130px;
+        padding-top: 10rem;
     }
     .Navbar nav {
         justify-content: space-between;
@@ -631,7 +639,11 @@ th::selection
         margin-left: 20px;
         border-radius: 15px;
     }
-    
+    .quantity-selection-container{
+        background: rgba($primary-green-light,0.2);
+        border-radius: 30px;
+        padding:0px 10px; 
+    }
 }
 //===============================================================================
 
@@ -671,6 +683,8 @@ th::selection
     .card-image{
         max-height: 200px;
         max-width: 200px;
+        min-height: 200px;
+        min-width: 200px;
         img{
             padding: 20px;
             max-height: 200px;
@@ -733,4 +747,7 @@ th::selection
         
     }
 }
+
+
 //===============================================================================
+

@@ -25,7 +25,9 @@ function Store(props) {
       searchReset();
       searchAction(searchTerm,category);
     },[searchTerm,category])
-    
+    useEffect(()=>{
+      console.log("searchState=>",{searchMessage, searchError, searchResults});
+    },[searchMessage,searchError, searchResults])
     return (
         <div className="Store Page">
             <div className="products-container container">

@@ -11,10 +11,11 @@ import { updateCartAction, addCartAction, removeFromCartAction, cartMessageReset
 import { testAction } from '../store/actions/testAction';
 import { db } from '../config/FirebaseConfig';
 import { useHistory } from 'react-router-dom';
+import Delayed from '../utils/Delayed';
 
 function Cart(props) {
     const [total, setTotal] = useState(0)
-    const [cart, setCart] = useState([])
+    const [cart, setCart] = useState()
     
     const authuid = useSelector(state=>state.firebase.auth.uid);
     useFirestoreConnect([ {
@@ -27,8 +28,8 @@ function Cart(props) {
     var cartCollectionObj = useSelector(state=>state.firestore.data.cart);
     
     useEffect(()=>{
-        if(!isLoaded) return;
-        if(isLoaded && (!cartCollection || !cartCollectionObj) ){ setCart([]); setTotal(0); return;}
+        if(!isLoaded(cartCollection) || !isLoaded(cartCollectionObj)) return;
+        if(!cartCollection || !cartCollectionObj){ setCart([]); setTotal(0); return;}
         getCart();
     },[cartCollection,cartCollectionObj])
     const getCart = async ()=>{
@@ -100,24 +101,37 @@ function Cart(props) {
         }
     },[cartMessage])
 
+
+    const cartTotalSectionJSX = (
+            <div className="col s12 m5 push-s0 push-m7">
+                <div className="cart-total-container center">
+                  <h6 className="primary-green-light">Cart Total</h6>
+                  <h5 className="price-container center-align primary-green-dark heavy_text">{priceFormat(total)}</h5>
+                  <div className="btn dark_btn proceed_to_payment_btn">Proceed to Payment</div>
+                </div>
+            </div>);
+    const cartItemsJSX = (
+            <div className="col s12 m7 pull-s0 pull-m5">
+                <div className="cart-items-container">
+                  {cart && cart.map(cartItem=>( <CartCard key={uuid()} cartFunc={cartFunc} cartItem={cartItem} /> ))}
+                </div>
+            </div>);
+    const CartPageMarkUpJSX = (
+            <div className="row">
+                {cartTotalSectionJSX}
+                {cartItemsJSX}
+            </div>
+    )
+
     return (
         <div className="Cart">
             <div className="container">
                 <h5 className="primary-green-dark-text">Your Shopping <span className="heavy_text">Cart</span></h5>
-                <div className="row">
-                  <div className="col s12 m5 push-s0 push-m7">
-                      <div className="cart-total-container center">
-                        <h6 className="primary-green-light">Cart Total</h6>
-                        <h5 className="center-align primary-green-dark heavy_text">{priceFormat(total)}</h5>
-                        <div className="btn dark_btn">Proceed to Payment</div>
-                      </div>
-                  </div>
-                  <div className="col s12 m7 pull-s0 pull-m5">
-                      <div className="cart-items-container">
-                        {cart && cart.map(cartItem=>( <CartCard key={uuid()} cartFunc={cartFunc} cartItem={cartItem} /> ))}
-                      </div>
-                  </div>
-                </div>
+                <Delayed waitBeforeShow={3000}>
+                    {(cart)
+                    ?(CartPageMarkUpJSX)
+                    :( <p>Your Shopping Cart is Empty</p> )}
+                </Delayed>
             </div>
         </div>
     )

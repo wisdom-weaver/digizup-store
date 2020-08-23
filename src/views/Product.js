@@ -16,6 +16,7 @@ import 'react-owl-carousel2/src/owl.theme.green.css'; //Allows for server-side r
 
 import { v1 as uuid } from "uuid";
 import { addToCartAction, cartMessageReset } from '../store/actions/cartUpdateActions';
+import Delayed from '../utils/Delayed';
 
 function Product(props) {
     const {productid} = props.match.params;
@@ -260,11 +261,17 @@ function Product(props) {
     return (
         <div className='Product Page'>
             <div className="container">
+                
+            <Delayed waitBeforeShow={2000} >
                 {
-                    (isLoaded(product))
-                    ?( isLoaded(renderedProduct)?(renderedProductJSX):( <p>Product Not Found</p> ) )
-                    :( <p>Loading...</p> )
+                    (renderedProduct)
+                    ?(renderedProductJSX)
+                    :( <p>Product Not Found</p> ) 
+                    
                 }
+            </Delayed>
+                
+                
             </div>
         </div>
     )

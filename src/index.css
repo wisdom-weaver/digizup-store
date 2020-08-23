@@ -529,12 +529,23 @@ th::selection {
   margin-bottom: 10rem;
 }
 
+.Page .top-popup, .Login .top-popup, .Signup .top-popup, .Cart .top-popup {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 5.5rem;
+}
+
 @media only screen and (max-width: 637px) {
   .Page, .Login, .Signup, .Cart {
-    padding-top: 130px;
+    padding-top: 10rem;
+  }
+  .Page .top-popup, .Login .top-popup, .Signup .top-popup, .Cart .top-popup {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 10.5rem;
   }
   .Navbar .side_menu .side_menu_content {
-    padding-top: 130px;
+    padding-top: 10rem;
   }
   .Navbar nav {
     -webkit-box-pack: justify;
@@ -877,6 +888,12 @@ th::selection {
   border-radius: 15px;
 }
 
+.Product .quantity-selection-container {
+  background: rgba(32, 146, 127, 0.2);
+  border-radius: 30px;
+  padding: 0px 10px;
+}
+
 .Cart .cart-total-container {
   padding: 20px;
   margin: 10px;
@@ -905,6 +922,8 @@ th::selection {
 .CartCard .card-image {
   max-height: 200px;
   max-width: 200px;
+  min-height: 200px;
+  min-width: 200px;
 }
 
 .CartCard .card-image img {

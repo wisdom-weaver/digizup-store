@@ -10,23 +10,26 @@ import Login from './views/Login';
 import Signup from './views/Signup';
 import Product from './views/Product';
 import Test from './views/Test';
+import ScrollToTop from './utils/ScrollToTop';
 
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
-        <Navbar />
-        <Switch>
-          <Route exact path="/about"> <About /> </Route>
-          <Route exact path="/store"> <Store /> </Route>
-          <Route exact path="/cart"> <Cart /> </Route>
-          <Route exact path="/checkout"> <Checkout /> </Route>
-          <Route exact path="/login"> <Login /> </Route>
-          <Route exact path="/signup"> <Signup /> </Route>
-          <Route exact path="/product/:productid"> <Product /> </Route>
-          <Route exact path="/test"> <Test /> </Route>          
-          <Route exact path="/"> <Home /> </Route>
-        </Switch>
+        <ScrollToTop >
+          <Navbar />
+          <Switch>
+            <Route exact path="/about"> <About /> </Route>
+            <Route exact path="/store"> <Store /> </Route>
+            <Route exact path="/cart"> <Cart /> </Route>
+            <Route exact path="/checkout"> <Checkout /> </Route>
+            <Route exact path="/login"> <Login /> </Route>
+            <Route exact path="/signup"> <Signup /> </Route>
+            <Route exact path="/product/:productid"> <Product /> </Route>
+            <Route exact path="/test"> <Test /> </Route>          
+            <Route exact path="/"> <Home /> </Route>
+          </Switch>
+        </ScrollToTop>
       </BrowserRouter>
     </div>
   );
