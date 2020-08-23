@@ -41,7 +41,7 @@ function Navbar(props) {
     const [searchTerm,setSearchTerm] = useState('');
     var query = queryString.parse(props?.location?.search);
     useEffect(()=>{
-      setSearchTerm(query?.searchTerm);
+      setSearchTerm(query?.searchTerm ?? '');
     },[query?.searchTerm]);
     useEffect(()=>{
       setCategory(query?.category ?? 'All');
@@ -122,7 +122,13 @@ function Navbar(props) {
       <div className="navbar__searchInput_container">
         <div className="navbar__searchInput" >
         {dropdown_html}  
-        <input id="searchInput" onKeyDown={(e)=>{ if(e.keyCode==13){submitSearch();} }} onChange={(e)=>{setSearchTerm(e.target.value)}}type="text" value={searchTerm} />
+        <input 
+          id="searchInput" 
+          type="text"
+          value={searchTerm}
+          onChange={ e=>setSearchTerm(e.target.value) }
+          onKeyDown={ e=>{ if(e.keyCode==13)submitSearch();} }
+        />
         <i onClick={submitSearch} className="material-icons search-icon">search</i>
       </div>
       </div>

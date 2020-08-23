@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { withRouter, useHistory } from 'react-router-dom'
 import { compose } from 'redux';
 import { connect, useSelector } from 'react-redux';
-import { useFirestoreConnect } from 'react-redux-firebase';
+import { useFirestoreConnect, isLoaded } from 'react-redux-firebase';
 
 import queryString from 'query-string'
 import { renderIntoDocument } from 'react-dom/test-utils';
@@ -15,13 +15,14 @@ import 'react-owl-carousel2/src/owl.carousel.css'; //Allows for server-side rend
 import 'react-owl-carousel2/src/owl.theme.green.css'; //Allows for server-side rendering.
 
 import { v1 as uuid } from "uuid";
+import { addToCartAction, cartMessageReset } from '../store/actions/cartUpdateActions';
 
 function Product(props) {
     const {productid} = props.match.params;
     const [productOption, setProductOption] = useState(queryString.parse(props?.location?.search)?.productOption);
     
     const history = useHistory();
-
+    const {addToCart} = props;
     useFirestoreConnect([
         {collection: 'products', doc: productid}
     ])
@@ -119,15 +120,24 @@ function Product(props) {
         // console.log(newArr);
         var newProductOption = toOptionString(newArr);
         // console.log(newProductOption);
+        handleCartUpdate(1);
         setProductOption(newProductOption);
     }
     
     const [cartQuantity, setCartQuantity] = useState(1);
 
     const handleCartUpdate = (val)=>{
-        if(val>= 0) setCartQuantity(val)
+        if(val> 0) setCartQuantity(val)
         else{ setCartQuantity(1) }
     }
+    
+    const cartMessage = props?.cartUpdate?.cartMessage
+    
+    useEffect(()=>{
+        if(cartMessage == 'CART_ADDED'){
+            cartMessageReset();
+        }
+    },[cartMessage])
 
 
     const options = {
@@ -177,7 +187,7 @@ function Product(props) {
                                                 return (<div key={uuid()} className="btn btn-small product-each-option-element active">{eachOptionElement.optionName}</div>)
                                             }else{
                                                 return (<div key={uuid()}
-                                                onClick={()=>{ selectOption(eachOptionIndex, eachOptionElementIndex) }}
+                                                onClick={()=>{ selectOption(eachOptionIndex, eachOptionElementIndex); }}
                                                 className="btn btn-small product-each-option-element">{eachOptionElement.optionName}</div>)
                                             }
                                         })
@@ -201,7 +211,14 @@ function Product(props) {
                                 <input value={cartQuantity} onChange={(e)=>{handleCartUpdate(e.target.value)}} className="cart-quantity-input" type="number"/>
                                 <div onClick={()=>{handleCartUpdate(cartQuantity+1)}} className="btn-floating quantity-adjustment-btn"> <i className="material-icons">add_circle</i> </div>
                             </div>
-                            <div className="btn btn add-to-cart-btn"> <i className="material-icons">add_shopping_cart</i> Add to Cart</div>
+                            <div 
+                                onClick={(e)=>{
+                                    console.log('adding to cart');
+                                    addToCart(productid, productOption, cartQuantity);
+                                    history.push('/cart');
+                                }}
+                                className="btn btn add-to-cart-btn"
+                            > <i className="material-icons">add_shopping_cart</i> Add to Cart</div>
                         </div>
                     </div>
                 ):(
@@ -243,9 +260,11 @@ function Product(props) {
     return (
         <div className='Product Page'>
             <div className="container">
-                {(renderedProduct)
-                ?( renderedProductJSX )
-                :( <p>Product not found</p> )}
+                {
+                    (isLoaded(product))
+                    ?( isLoaded(renderedProduct)?(renderedProductJSX):( <p>Product Not Found</p> ) )
+                    :( <p>Loading...</p> )
+                }
             </div>
         </div>
     )
@@ -253,18 +272,19 @@ function Product(props) {
 
 const mapStateToProps = (state)=>{
     return {
-
+        cartUpdate: state.cartUpdate
     }
 }
 
-const mapDispatchToProps = ()=>{
+const mapDispatchToProps = (dispatch)=>{
     return {
-
+        addToCart: (productid, option, cartQty)=>{ dispatch( addToCartAction(productid, option, cartQty) ) },
+        cartMessageReset: ()=>{ dispatch( cartMessageReset() ) }
     }
 }
 
 export default 
 compose(
-    connect(mapStateToProps,null),
+    connect(mapStateToProps,mapDispatchToProps),
     withRouter
 )(Product)

@@ -1,8 +1,9 @@
 import _ from "lodash";
 
 export const searchAction = (searchTerm, category)=>{
-    console.log('in searchAction', searchTerm, category);
+    // console.log('in searchAction', searchTerm, category);
     return async (dispatch, getState, {getFirestore, getFirebase})=>{
+        dispatch({type:'SEARCH_IN_PROGRESS'});
         const firestore = getFirestore();
         searchTerm= searchTerm.toLowerCase();
         var keywords = searchTerm.split(/(?:,| |\+|-|\(|\))+/);
@@ -30,7 +31,7 @@ export const searchAction = (searchTerm, category)=>{
             });
         })
         out = _.orderBy( out, ['matches','option'], ['desc','asc']);
-        console.log('Results=>',out);
+        // console.log('Results=>',out);
         if(out.length > 0) dispatch({ type:"SEARCH_RESULTS_FETCHED", searchResults: out });
         else dispatch({ type:"SEARCH_RESULTS_NOT_FOUND", err: "No Results Found" });
     }

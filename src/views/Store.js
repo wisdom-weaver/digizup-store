@@ -38,7 +38,7 @@ function Store(props) {
                 ?( <p>{searchError}</p> ):null
               }
               {
-                (searchMessage == 'SEARCH_RESET' )
+                (searchMessage == 'SEARCH_IN_PROGRESS' )
                 ?( <p>Loading...</p> ):null
               }
             </div>

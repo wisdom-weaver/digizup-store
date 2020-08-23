@@ -24,6 +24,33 @@ body{
     font-weight: 400;
 }
 
+.btn::selection,
+i::selection
+{
+    background: inherit;
+    color: inherit;
+}
+p::selection,
+div::selection,
+li::selection,
+span::selection,
+h1::selection,
+h2::selection,
+h3::selection,
+h4::selection,
+h5::selection,
+h6::selection,
+sub::selection,
+sup::selection,
+table::selection,
+tr::selection,
+td::selection,
+th::selection
+{
+    background: rgba($primary-green-dark, 0.6);
+    color: white;
+}
+
 .line-break{
     white-space: pre-wrap;
     position: relative;
@@ -70,6 +97,22 @@ body{
     text-transform: inherit;
     white-space: nowrap;
     border: 2px solid $primary-green-dark;
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    transition: all 0.2s;
+    margin: 5px;
+    &:hover{
+        background-color: $primary-green-light !important;
+    }
+}
+
+.red_btn{
+    background-color: rgb(248, 75, 75) !important;
+    border-radius: 10px !important;
+    box-shadow: none;
+    text-transform: inherit;
+    white-space: nowrap;
     color: white;
     font-weight: 700;
     font-size: 15px;
@@ -347,6 +390,7 @@ body{
 .Page{
     min-height: 100vh;
     padding-top: 5.5rem;
+    margin-bottom: 10rem;
 }
 
 @media only screen and (max-width: 637px) {
@@ -521,7 +565,7 @@ body{
 }
 
 //===============================================================================
-
+//Product
 .Product{
 
     .product-image-container{
@@ -587,37 +631,106 @@ body{
         margin-left: 20px;
         border-radius: 15px;
     }
-    .quantity-selection-container{
-        background: rgba($primary-green-dark, 0.2);
-        padding:0 !important;
-        margin: 2px 2px;
+    
+}
+//===============================================================================
+
+//===============================================================================
+//Cart
+.Cart{
+    @extend .Page;
+    .cart-total-container{
+        padding: 20px;
+        margin: 10px;
         border-radius: 40px;
+    }    
+    .cart-total-container{
+        background: white;
+    }
+    .cart-items-container{
+        // background: rgba($primary-creme-dark, 0.6);
+        padding: 0px;
+        margin: 0px;
+        border-radius: 15px;
+    }
+    
+}
+//===============================================================================
+
+
+//===============================================================================
+//CartCard
+.CartCard{
+    .card{
+        border-radius: 20px;
+        overflow: hidden;
+        margin: 0px;
+        box-shadow: none !important;
+        margin-bottom: 10px;
+    }
+    .card-image{
+        max-height: 200px;
+        max-width: 200px;
+        img{
+            padding: 20px;
+            max-height: 200px;
+            max-width: 200px;
+            height: 200px;
+            width: 200px;
+            object-fit: contain;
+        }
+    }
+    .quantity-selection-container{
+        background: rgba($primary-green-light,0.2);
+        border-radius: 30px;
+        padding:0px 10px; 
+    }
+    .product-quantity-selection{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding:5px 10px;
+    }
+    .cart-quantity-input{
+        max-width: 50px;
+        text-align: center;
+        border: none !important;
+        margin: 0px !important;
+        padding: 0 !important;
+    }
+    .quantity-adjustment-btn{
+        background: transparent;
+        box-shadow: none !important;
+        margin: 0px !important;
+        padding: 0 !important;
+        i{
+            color: $primary-green-dark;
+            font-size: 30px;
+        }
+    }
+    .add-to-cart-btn{
+        background: $primary-green-dark !important;
+        text-transform: inherit;
+        margin-left: 20px;
+        border-radius: 15px;
+    }
+    .cart-management{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        div{
+            width: max-content;
+        }
+    }
+    .card-info{
+        margin-bottom: 10px;
+    }
+    .remove_btn{
+        @extend .red_btn;
+        border-radius: 20px !important;
+        
     }
 }
-
-.btn::selection,
-i::selection
-{
-    background: inherit;
-    color: inherit;
-}
-p::selection,
-div::selection,
-li::selection,
-span::selection,
-h1::selection,
-h2::selection,
-h3::selection,
-h4::selection,
-h5::selection,
-h6::selection,
-sub::selection,
-sup::selection,
-table::selection,
-tr::selection,
-td::selection,
-th::selection
-{
-    background: rgba($primary-green-dark, 0.6);
-    color: white;
-}
+//===============================================================================
