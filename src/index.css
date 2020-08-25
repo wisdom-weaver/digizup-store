@@ -15,6 +15,13 @@ body {
   font-weight: 400;
 }
 
+.round-card {
+  border-radius: 40px;
+  -webkit-box-shadow: none !important;
+          box-shadow: none !important;
+  overflow: hidden;
+}
+
 .btn::-moz-selection,
 i::-moz-selection {
   background: inherit;
@@ -136,7 +143,25 @@ th::selection {
   font-size: 15px;
   -webkit-transition: all 0.2s;
   transition: all 0.2s;
-  margin: 5px;
+  margin: 5px auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
 }
 
 .light_btn:hover, .login_btn:hover {
@@ -157,11 +182,28 @@ th::selection {
   font-size: 15px;
   -webkit-transition: all 0.2s;
   transition: all 0.2s;
-  margin: 5px;
+  margin: 5px auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .dark_btn:hover, .signup_btn:hover {
-  background-color: #20927F !important;
+  background-color: rgba(6, 84, 70, 0.9) !important;
+  border: 2px solid rgba(6, 84, 70, 0.8);
 }
 
 .red_btn, .CartCard .remove_btn {
@@ -1013,5 +1055,110 @@ th::selection {
 
 .CartCard .remove_btn {
   border-radius: 20px !important;
+}
+
+@media only screen and (max-width: 637px) {
+  .Cart .cart-total-container {
+    -webkit-transition: all 2s;
+    transition: all 2s;
+  }
+  .Cart .cart-total-container.shrink {
+    -webkit-transition: all 2s;
+    transition: all 2s;
+    border: 1px solid #065446;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 10rem;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+    padding: 5px 10px;
+    z-index: 600;
+  }
+  .Cart .cart-total-container.shrink .price-container {
+    -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+            flex-grow: 1;
+    font-size: 20px;
+  }
+  .Cart .cart-total-container.shrink .proceed_to_payment_btn {
+    word-wrap: wrap;
+    font-size: 10px;
+  }
+  .Cart .CartCard {
+    z-index: 500;
+  }
+}
+
+.Checkout .stage-map {
+  background-color: #065446 !important;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.Checkout .stage_arrow {
+  font-size: 50px;
+  background: #065446;
+  border-radius: 30px;
+  overflow: hidden;
+  color: white;
+  margin: 5px 10px;
+}
+
+.Checkout .stage_arrow.disabled {
+  background: rgba(6, 84, 70, 0.2);
+  cursor: not-allowed;
+}
+
+.Checkout .stage_control_panel {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.Checkout .stage_title {
+  min-width: 230px;
+  text-align: center;
+}
+
+.Checkout .payment-mode-option {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+}
+
+.Checkout .payment-mode-option .payment-mode-option-name {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
 }
 /*# sourceMappingURL=index.css.map */

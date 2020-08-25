@@ -53,7 +53,7 @@ function Navbar(props) {
 
     const menuOpen = ()=>{
       //console.log('menu-open');
-      $('.side_menu').css('zIndex', '100');
+      $('.side_menu').css('zIndex', '2900');
       $('.side_menu_content').css('transform', 'translateX(0%)');
       $('.overlay').css('opacity', '1');
     }
@@ -79,7 +79,9 @@ function Navbar(props) {
       $('link').click(()=>{ console.log('link Click'); setMenuOpenState(false)})
       $('ovelayLink').click(()=>{ console.log('link Click');; setMenuOpenState(false)})
       window.addEventListener("resize", updateWidthAndHeight);
-      return () => window.removeEventListener("resize", updateWidthAndHeight);
+      return () => {
+        window.removeEventListener("resize", updateWidthAndHeight)
+      };
     },[])
 
     const submitSearch = ()=>{
@@ -253,7 +255,7 @@ function Navbar(props) {
 }
 
 const mapStateToProps = (state)=>{
-  //console.log('state',state);
+  // console.log('state',state);
   return {
     categories: state.firestore.ordered.categories,
     auth: state.firebase.auth,

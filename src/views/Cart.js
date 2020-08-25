@@ -106,8 +106,8 @@ function Cart(props) {
             <div className="col s12 m5 push-s0 push-m7">
                 <div className="cart-total-container center">
                   <h6 className="primary-green-light">Cart Total</h6>
-                  <h5 className="price-container center-align primary-green-dark heavy_text">{priceFormat(total)}</h5>
-                  <div className="btn dark_btn proceed_to_payment_btn">Proceed to Payment</div>
+                  <h5 className="center-align primary-green-dark heavy_text">{priceFormat(total)}</h5>
+                  <div onClick={()=>{history.push('/checkout')}} className="btn dark_btn">Checkout</div>
                 </div>
             </div>);
     const cartItemsJSX = (

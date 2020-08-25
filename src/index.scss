@@ -24,6 +24,12 @@ body{
     font-weight: 400;
 }
 
+.round-card{
+    border-radius: 40px;
+    box-shadow: none !important;
+    overflow: hidden;
+}
+
 .btn::selection,
 i::selection
 {
@@ -83,7 +89,13 @@ th::selection
     font-weight: 700;
     font-size: 15px;
     transition: all 0.2s;
-    margin: 5px;
+    margin: 5px auto;
+    display:flex;
+    flex-shrink: 1;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: max-content;
     &:hover{
        background-color: $primary-green-dark !important;
        color: white;
@@ -101,9 +113,16 @@ th::selection
     font-weight: 700;
     font-size: 15px;
     transition: all 0.2s;
-    margin: 5px;
+    margin: 5px auto;
+    display:flex;
+    width: max-content;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     &:hover{
-        background-color: $primary-green-light !important;
+        background-color: rgba($primary-green-dark,0.9) !important;
+        border: 2px solid rgba($primary-green-dark,0.8);
+
     }
 }
 
@@ -747,7 +766,74 @@ th::selection
         
     }
 }
-
+@media only screen and (max-width: 637px) {
+    .Cart{
+        .cart-total-container{
+            transition: all 2s;
+        }
+        .cart-total-container.shrink{
+            transition: all 2s;
+            border: 1px solid $primary-green-dark;
+            position: sticky;
+            top: 10rem;
+            display: flex;
+            flex-direction: row;
+            padding: 5px 10px;;
+            z-index: 600;
+            .price-container{
+                flex-grow: 1;
+                font-size: 20px;
+            }
+            .proceed_to_payment_btn{
+                word-wrap: wrap;
+                font-size: 10px;
+            }
+        }
+        .CartCard{ z-index: 500; }
+    }
+}
 
 //===============================================================================
 
+//===============================================================================
+//Checkout
+.Checkout{
+    .stage-map{
+        background-color: $primary-green-dark !important;
+        justify-content: center;
+        align-items: center
+    }
+    .stage_arrow{
+        font-size: 50px;
+        background: $primary-green-dark;
+        border-radius: 30px;
+        overflow: hidden;
+        color: white;
+        margin: 5px 10px;
+        &.disabled{
+            background:rgba($primary-green-dark,0.2);;
+            cursor: not-allowed;
+        }
+    }
+    .stage_control_panel{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+    .stage_title{
+        min-width: 230px;
+        text-align: center;
+    }
+    .payment-mode-option{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        .payment-mode-option-name{
+            flex-grow: 1;
+        }
+    }
+}
+//===============================================================================
