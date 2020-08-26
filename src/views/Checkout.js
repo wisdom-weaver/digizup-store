@@ -3,9 +3,11 @@ import 'materialize-css';
 import { Collapsible, CollapsibleItem, Icon, Modal, Button } from 'react-materialize';
 import queryString from 'query-string';
 import { compose } from 'redux';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { withRouter, useHistory } from 'react-router-dom';
 import { v1 as uuid, parse } from "uuid";
+import { isLoaded, useFirestoreConnect, useFirebaseConnect } from 'react-redux-firebase';
+import { db } from '../config/FirebaseConfig';
 
 function Checkout(props) {
     // console.log(props);
@@ -29,26 +31,108 @@ function Checkout(props) {
         // if( !query.stage ) history.push('/checkout?stage='+stage);
         // setStage(parseInt(query.stage));
     // },[query])
+
+    const authuid = useSelector(state=> state.firebase.auth.uid);
+    useFirestoreConnect([{
+        collection: 'users',
+        doc: authuid,
+        subcollections: [{collection:'cart'}],
+        storeAs: 'cart'
+    },{
+        collection: 'users',
+        doc: authuid,
+        subcollections: [{collection:'savedAddresses'}],
+        storeAs: 'savedAddresses'
+    },{
+        collection: 'users',
+        doc: authuid,
+        subcollections: [{collection:'savedCards'}],
+        storeAs: 'savedCards'
+    }]);
+
+    const cartCollection = useSelector(state=>state.firestore.ordered.cart);
+    const savedAddresses = useSelector(state=> state.firestore.ordered.savedAddresses);
+    const savedCards = useSelector(state=> state.firestore.ordered.savedCards) ;
+    const cartCollectionObj = useSelector(state=>state.firestore.data.cart);
+
+    const [cart, setCart] = useState();
+    const [total, setTotal] = useState(0)
+    useEffect(()=>{
+        if(!isLoaded(cartCollection) || !isLoaded(cartCollectionObj)) return;
+        if(!cartCollection || !cartCollectionObj){ setCart([]); setTotal(0); return;}
+        getCart();
+    },[cartCollection,cartCollectionObj])
+    useEffect(() => {
+        if(!isLoaded(savedCards)) return;
+        else console.log('savedCards loaded', savedCards);
+    }, [savedCards])
+    useEffect(() => {
+        if(!isLoaded(savedAddresses)) return;
+        else console.log('savedAddresses loaded', savedAddresses);
+    }, [savedAddresses])
+    const getCart = async ()=>{
+        //console.log('getcart', cartCollection);
+        var localCart = [];
+        var localTotal = 0;
+        var cartCollectionIds = Object.keys(cartCollectionObj);
+        for(let i=0;i<cartCollection.length;i++){
+            //console.log(i);
+            try{
+                var cartEach = cartCollection[i];
+            //console.log(cartEach);
+            var cartProductDoc = await db.collection('products').doc(cartEach?.cartItemRef).get();
+            if(cartProductDoc.empty){ /* console.log('product doc not found'); */ continue;}
+            var cartProduct = cartProductDoc.data();
+            //console.log(cartProduct);
+            var localCartItem = {}
+            if(cartEach.option == false){
+                localCartItem = {
+                    productName : cartProduct.productName,
+                    productid : cartProductDoc.id,
+                    price: cartProduct.price,
+                    defaultImage: cartProduct.images[0],
+                    cartQty : cartEach.cartQty,
+                    option: false,
+                    cartid: cartCollectionIds[i]
+                }
+                localTotal += localCartItem.price*localCartItem.cartQty;
+            }else{
+                localCartItem = {
+                    productName : cartProduct[cartEach.option].productFullName,
+                    productid : cartProductDoc.id,
+                    price: cartProduct[cartEach.option].price,
+                    defaultImage: cartProduct[cartEach.option].images[0],
+                    cartQty : cartEach.cartQty,
+                    option: cartEach.option,
+                    cartid: cartCollectionIds[i]
+                }
+                localTotal += localCartItem.price*localCartItem.cartQty;
+            }
+            }catch(er){continue;}
+            //console.log(localCartItem);
+            localCart.push(localCartItem);
+        }
+        setCart(localCart);
+        setTotal(localTotal);
+    }
     
-    var cartItems = [
-        { productName:'OnePlus 8 (Glacier Green, 6GB RAM+ 128GB Storeage)', price:41999 , cartQty: 2  },
-        { productName:'Samsung 4k monitor', price:38799 , cartQty: 1  },
-    ];
-
-    var deliveryLocations = [
-        { fullName: 'Danish Ansari', addressLine: '188/A, JailRoad, Naini', city: 'Prayagraj', state:'Uttar Pradesh', country:'India', phoneNo:'+91 9336674604', pincode:211008 },
-        { fullName: 'Wisdom Weaver', addressLine: '188/A, JailRoad, Naini', city: 'Prayagraj', state:'Uttar Pradesh', country:'India', phoneNo:'+91 9336674604', pincode:211008 }
-    ];
     var [deliveryLocationIndex, setDeliverLocationIndex] = useState(0);
-
+    const [newAddress, setNewAddress] = useState({
+        fullName    :'',
+        addressLine :'',
+        city    :'',
+        state   :'',
+        country :'',
+        pincode :'',
+        phoneNo :''
+    });
     const deliverySectionJSX = (
         <div className="checkout-delivery-section">
         {/* 1=> delivery addresses and speeds */}
-            {/* {deliveryLocations Cards} */}
+            {/* {savedAddresses Cards} */}
             <h6 className="center-align">Choose Your Delivery Location</h6>
             <div className="row"> 
-                {deliveryLocations?(
-                    deliveryLocations.map((eachLoc,index)=>(
+                {isLoaded(savedAddresses) && savedAddresses && savedAddresses.map((eachLoc,index)=>(
                     <div key={uuid()} className="col s6 m6 l4">
                     <div className="card round-card" onClick={()=>{setDeliverLocationIndex(index)}} >
                         <div className="card-content">
@@ -64,16 +148,13 @@ function Checkout(props) {
                         </div>
                     </div>
                     </div>
-                ))
-                ):(
-                    <span>No addresses found</span>
-                )}
+                ))}
                 <div className="col s12"></div>
                 <div className="col s12 m6 center">
                     <Modal
                       actions={[
                         (<Button flat modal="close" node="button" waves="red">Close</Button>),
-                        (<Button flat modal="close" node="button" waves="green">Add Address</Button>)
+                        (<Button onClick={()=>{console.log(newAddress)}} flat modal="close" node="button" waves="green">Add Address</Button>)
                       ]}
                       bottomSheet={false}
                       fixedFooter={true}
@@ -99,34 +180,34 @@ function Checkout(props) {
                         <div className="row">
                             <div className="input-field col s12">
                                 <i className="material-icons prefix">account_circle</i>
-                                <input id="fullName-addAddress" type="text" required />
+                                <input onChange={(e)=>{setNewAddress({...newAddress, fullName:e.target.value})}} value={newAddress.fullName} id="fullName-addAddress" type="text" required />
                                 <label  htmlFor="fullName-addAddress">Full Name</label>
                             </div>
                             <div className="input-field col s12">
                                 <i className="material-icons prefix">location_city</i>
-                                <input id="addressLine-addAddress" type="text" required />
+                                <input onChange={(e)=>{setNewAddress({...newAddress, addressLine:e.target.value})}} value={newAddress.addressLine} id="addressLine-addAddress" type="text" required />
                                 <label htmlFor="addressLine-addAddress">Address Line</label>
                             </div>
                             <div className="input-field col s6">
                                 <i className="material-icons prefix">location_on</i>
-                                <input id="city-addAddress" type="text" required />
+                                <input onChange={(e)=>{setNewAddress({...newAddress, city:e.target.value})}} value={newAddress.city} id="city-addAddress" type="text" required />
                                 <label htmlFor="city-addAddress">City</label>
                             </div>
                             <div className="input-field col s6">
-                                <input id="state-addAddress" type="text" required />
+                                <input onChange={(e)=>{setNewAddress({...newAddress, state:e.target.value})}} value={newAddress.state} id="state-addAddress" type="text" required />
                                 <label htmlFor="state-addAddress">State</label>
                             </div>
                             <div className="input-field col s6">
-                                <input id="country-addAddress" type="text" required />
+                                <input onChange={(e)=>{setNewAddress({...newAddress, country:e.target.value})}} value={newAddress.country} id="country-addAddress" type="text" required />
                                 <label htmlFor="country-addAddress">Country</label>
                             </div>
                             <div className="input-field col s6">
-                                <input id="pincode-addAddress" type="text" required />
+                                <input onChange={(e)=>{setNewAddress({...newAddress, pincode:e.target.value})}} value={newAddress.pincode} id="pincode-addAddress" type="text" required />
                                 <label htmlFor="pincode-addAddress">Pincode</label>
                             </div>
                             <div className="input-field col s12">
                                 <i className="material-icons prefix">local_phone</i>
-                                <input id="phoneNo-addAddress" type="text" required />
+                                <input onChange={(e)=>{setNewAddress({...newAddress, phoneNo:e.target.value})}} value={newAddress.phoneNo} id="phoneNo-addAddress" type="text" required />
                                 <label htmlFor="phoneNo-addAddress">Phone Number</label>
                             </div>
                         </div>
@@ -141,19 +222,21 @@ function Checkout(props) {
     );
     
     
-   var savedCards  = [
-       {cardHolderName:'DANISH ANSARI', cardNo:'1212121212121212', cardExpMM:'06', cardExpYY:'28'},
-       {cardHolderName:'Wisdom Weaver', cardNo:'5858585858585858', cardExpMM:'07', cardExpYY:'26'}
-   ]
    var [savedCardIndex, setSavedCardIndex] = useState(0);
-
+   const [newCard, setNewCard] = useState({
+    cardHolderName  : '',
+    cardNo          : '',
+    cardExpMM       : '',
+    cardExpYY       : ''
+   })
+   
     var paymentModes = [
         { paymentModeHead:"Credit / Debit Card",             paymentModeIcon:'payment',      paymentModeInner:(
             <div>
                 <p>we accept  VISA, MasterCard and Western Union credit/debit cards only.* </p> 
                 <p>Saved Cards:</p>
                 <div className="row">
-                    {savedCards.map((card,index)=>(
+                    {isLoaded(savedCards) && savedCards  && savedCards.map((card,index)=>(
                         <div className="col s12 m6">
                             <div className="card round-card"
                             onClick={()=>{setSavedCardIndex(index)}} 
@@ -163,9 +246,13 @@ function Checkout(props) {
                                         <input name="savedCardsGroup" type="radio" checked={( index == savedCardIndex )} />
                                         <span></span>
                                     </label>
-                                    <p>Card Holder: {card.cardHolderName}</p>
-                                    <p>Card No: {'XXXX XXXX XXXX '+card.cardNo.slice(12)}</p>
-                                    <p>Card Expiry: { card.cardExpMM+'/'+card.cardExpYY }</p>
+                                    {/* {card?( */}
+                                        {/* <div> */}
+                                            {/* <p>Card Holder: {card.cardHolderName}</p> */}
+                                            {/* <p>Card No: {'XXXX XXXX XXXX '+card.cardNo.slice(12)}</p> */}
+                                            {/* <p>Card Expiry: { card.cardExpMM+'/'+card.cardExpYY }</p> */}
+                                        {/* </div> */}
+                                    {/* ):(null)} */}
                                 </div>
                             </div>
                         </div>
@@ -175,7 +262,7 @@ function Checkout(props) {
                     <Modal
                       actions={[
                         (<Button flat modal="close" node="button" waves="red">Close</Button>),
-                        (<Button flat modal="close" node="button" waves="green">Add Address</Button>)
+                        (<Button onClick={()=>{console.log(newCard); }} flat modal="close" node="button" waves="green">Add Address</Button>)
                       ]}
                       bottomSheet={false}
                       fixedFooter={true}
@@ -201,35 +288,22 @@ function Checkout(props) {
                         <div className="row">
                             <div className="input-field col s12">
                                 <i className="material-icons prefix">account_circle</i>
-                                <input id="fullName-addAddress" type="text" required />
-                                <label  htmlFor="fullName-addAddress">Full Name</label>
+                                <input onChange={(e)=>{setNewCard({...newCard, cardHolderName:e.target.value})}} value={newCard.cardHolderName} id="cardHolderName-addCard" type="text" required />
+                                <label  htmlFor="cardHolder-addCard">Full Name</label>
                             </div>
-                            <div className="input-field col s12">
-                                <i className="material-icons prefix">location_city</i>
-                                <input id="addressLine-addAddress" type="text" required />
-                                <label htmlFor="addressLine-addAddress">Address Line</label>
+                            <div className="input-field col s8">
+                                <i className="material-icons prefix">payment</i>
+                                <input onChange={(e)=>{setNewCard({...newCard, cardNo:e.target.value})}} value={newCard.cardNo} id="cardNo-addCard" type="text" required />
+                                <label htmlFor="cardNo-addCard">Card Line</label>
+                                {/* <NumberFormat customInput={TextField} format="#### #### #### ####"/> */}
                             </div>
-                            <div className="input-field col s6">
-                                <i className="material-icons prefix">location_on</i>
-                                <input id="city-addAddress" type="text" required />
-                                <label htmlFor="city-addAddress">City</label>
+                            <div className="input-field col s2">
+                                <input onChange={(e)=>{setNewCard({...newCard, cardExpMM:e.target.value})}} value={newCard.cardExpMM} id="cardExpMM-addCard" type="text" required />
+                                <label htmlFor="cardExpMM-addCard">MM</label>
                             </div>
-                            <div className="input-field col s6">
-                                <input id="state-addAddress" type="text" required />
-                                <label htmlFor="state-addAddress">State</label>
-                            </div>
-                            <div className="input-field col s6">
-                                <input id="country-addAddress" type="text" required />
-                                <label htmlFor="country-addAddress">Country</label>
-                            </div>
-                            <div className="input-field col s6">
-                                <input id="pincode-addAddress" type="text" required />
-                                <label htmlFor="pincode-addAddress">Pincode</label>
-                            </div>
-                            <div className="input-field col s12">
-                                <i className="material-icons prefix">local_phone</i>
-                                <input id="phoneNo-addAddress" type="text" required />
-                                <label htmlFor="phoneNo-addAddress">Phone Number</label>
+                            <div className="input-field col s2">
+                                <input onChange={(e)=>{setNewCard({...newCard, cardExpYY:e.target.value})}} value={newCard.cardExpYY} id="cardExpYY-addCard" type="text" required />
+                                <label htmlFor="cardExpYY-addCard">YY</label>
                             </div>
                         </div>
                     </Modal>
@@ -286,21 +360,25 @@ function Checkout(props) {
         {/* 3=> order summary   */}
             <div className="summary-delivery">
                 <p className="flow-text">Delivery Address:</p>
-                <p>{deliveryLocations[deliveryLocationIndex].fullName}</p>
-                <p>{deliveryLocations[deliveryLocationIndex].addressLine}</p>
-                <p>{deliveryLocations[deliveryLocationIndex].city}, {deliveryLocations[deliveryLocationIndex].state}-{deliveryLocations[deliveryLocationIndex].pincode}</p>
-                <p>{deliveryLocations[deliveryLocationIndex].country}</p>
-                <p>{deliveryLocations[deliveryLocationIndex].phoneNo}</p>
+                {((isLoaded(savedAddresses) && savedAddresses)?(
+                    <div>
+                        <p>{savedAddresses[deliveryLocationIndex].fullName}</p>
+                        <p>{savedAddresses[deliveryLocationIndex].addressLine}</p>
+                        <p>{savedAddresses[deliveryLocationIndex].city}, {savedAddresses[deliveryLocationIndex].state}-{savedAddresses[deliveryLocationIndex].pincode}</p>
+                        <p>{savedAddresses[deliveryLocationIndex].country}</p>
+                        <p>{savedAddresses[deliveryLocationIndex].phoneNo}</p>
+                    </div>
+                ):(null))}
             </div>
             <br/><hr/><br/>
             <div className="summary-payments">
                 <p className="flow-text">Payment Options: {paymentModes[paymentModeIndex].paymentModeHead}</p>
-                {(paymentModeIndex == 0)?(
-                <div className="card-details">
-                    <p>Card Holder: {savedCards[savedCardIndex].cardHolderName}</p>
-                    <p>Card No: {'XXXX XXXX XXXX '+savedCards[savedCardIndex].cardNo.slice(12)}</p>
-                    <p>Card Expiry: { savedCards[savedCardIndex].cardExpMM+'/'+savedCards[savedCardIndex].cardExpYY }</p>
-                </div>
+                {( paymentModeIndex ==0 && savedCards && savedCardIndex)?(
+                    <div className="card-details">
+                        <p>Card Holder: {savedCards[savedCardIndex].cardHolderName}</p>
+                        <p>Card No: {'XXXX XXXX XXXX '+savedCards[savedCardIndex].cardNo?.slice(12)}</p>
+                        <p>Card Expiry: { savedCards[savedCardIndex].cardExpMM+'/'+savedCards[savedCardIndex].cardExpYY }</p>
+                    </div>
                 ):(null)}
             </div>
             <div className="summary-order-details">
@@ -309,7 +387,7 @@ function Checkout(props) {
                         <tr>
                             <td>Product</td> <td>Price/Qty</td> <td>Qty</td> <td>SubTotal</td>
                         </tr>
-                        {cartItems && cartItems.map(item=>( 
+                        { isLoaded(cartCollection) && cart && cart.map(item=>( 
                         <tr>
                             <td>{item.productName}</td> <td>{item.price}</td> <td>{item.cartQty}</td> <td>{item.price*item.cartQty}</td>
                         </tr> ))}
@@ -365,6 +443,7 @@ function Checkout(props) {
 }
 
 const mapStateToProps = (state)=>{
+    console.log('state',state);
     return {
 
     }
@@ -376,4 +455,6 @@ const mapDispatchToProps = (dispatch)=>{
     }
 }
 
-export default withRouter(Checkout)
+export default compose(
+    connect(mapStateToProps, mapDispatchToProps)
+)(Checkout)
