@@ -215,7 +215,16 @@ function Product(props) {
                             <div 
                                 onClick={(e)=>{
                                     console.log('adding to cart');
-                                    addToCart(productid, productOption, cartQuantity);
+                                    var newProduct = {
+                                        cartQty      : cartQuantity,
+                                        defaultImage : renderedProduct.images[0] ?? '',
+                                        option       : productOption ?? false,
+                                        productName  : renderedProduct.productName,
+                                        productPrice : renderedProduct.price,
+                                        productid    : productid ?? null ,
+                                        createdAt    : new Date()
+                                    }
+                                    addToCart(newProduct);
                                     history.push('/cart');
                                 }}
                                 className="btn btn add-to-cart-btn"
@@ -285,7 +294,7 @@ const mapStateToProps = (state)=>{
 
 const mapDispatchToProps = (dispatch)=>{
     return {
-        addToCart: (productid, option, cartQty)=>{ dispatch( addToCartAction(productid, option, cartQty) ) },
+        addToCart: (newProduct)=>{ dispatch( addToCartAction(newProduct) ) },
         cartMessageReset: ()=>{ dispatch( cartMessageReset() ) }
     }
 }

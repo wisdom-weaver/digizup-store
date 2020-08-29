@@ -100,6 +100,10 @@ th::selection
        background-color: $primary-green-dark !important;
        color: white;
     }
+    &.disabled{
+        border: none;
+        cursor: not-allowed !important;
+    }
 }
 
 .dark_btn{
@@ -123,6 +127,10 @@ th::selection
         background-color: rgba($primary-green-dark,0.9) !important;
         border: 2px solid rgba($primary-green-dark,0.8);
 
+    }
+    &.disabled{
+        border: none;
+        cursor: not-allowed !important;
     }
 }
 

@@ -169,6 +169,11 @@ th::selection {
   color: white;
 }
 
+.light_btn.disabled, .disabled.login_btn {
+  border: none;
+  cursor: not-allowed !important;
+}
+
 .dark_btn, .signup_btn {
   background-color: #065446 !important;
   border-radius: 10px !important;
@@ -204,6 +209,11 @@ th::selection {
 .dark_btn:hover, .signup_btn:hover {
   background-color: rgba(6, 84, 70, 0.9) !important;
   border: 2px solid rgba(6, 84, 70, 0.8);
+}
+
+.dark_btn.disabled, .disabled.signup_btn {
+  border: none;
+  cursor: not-allowed !important;
 }
 
 .red_btn, .CartCard .remove_btn {

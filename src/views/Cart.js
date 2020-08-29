@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import { priceFormat } from '../utils/utils'
 
 import CartCard from '../components/CartCard';
@@ -10,89 +10,51 @@ import { v1 as uuid } from 'uuid';
 import { updateCartAction, addCartAction, removeFromCartAction, cartMessageReset } from '../store/actions/cartUpdateActions';
 import { testAction } from '../store/actions/testAction';
 import { db } from '../config/FirebaseConfig';
-import { useHistory } from 'react-router-dom';
+import { useHistory, NavLink } from 'react-router-dom';
 import Delayed from '../utils/Delayed';
 
 function Cart(props) {
+    const history = useHistory();
+    const authuid = useSelector(state=> state.firebase.auth.uid ) ?? 'default';
+    useEffect(()=>{
+        if(!authuid || authuid == 'default'){
+            setTimeout(()=>{
+                // history.push('/login');
+            },3000)
+        }
+    },[authuid])
+
     const [total, setTotal] = useState(0)
-    const [cart, setCart] = useState()
     
-    const authuid = useSelector(state=>state.firebase.auth.uid);
     useFirestoreConnect([ {
         collection: 'users', 
         doc: authuid,
         subcollections: [{ collection: 'cart' }], 
         storeAs: 'cart' 
     } ])
-    var cartCollection = useSelector(state=>state.firestore.ordered.cart);
-    var cartCollectionObj = useSelector(state=>state.firestore.data.cart);
-    
+    const cartCollection = useSelector(state=> state.firestore.ordered.cart)
+    const [cart,setCart] = useState([]);
     useEffect(()=>{
-        if(!isLoaded(cartCollection) || !isLoaded(cartCollectionObj)) return;
-        if(!cartCollection || !cartCollectionObj){ setCart([]); setTotal(0); return;}
-        getCart();
-    },[cartCollection,cartCollectionObj])
-    const getCart = async ()=>{
-        //console.log('getcart', cartCollection);
-        var localCart = [];
-        var localTotal = 0;
-        var cartCollectionIds = Object.keys(cartCollectionObj);
-        for(let i=0;i<cartCollection.length;i++){
-            //console.log(i);
-            try{
-                var cartEach = cartCollection[i];
-            //console.log(cartEach);
-            var cartProductDoc = await db.collection('products').doc(cartEach?.cartItemRef).get();
-            if(cartProductDoc.empty){ /* console.log('product doc not found'); */ continue;}
-            var cartProduct = cartProductDoc.data();
-            //console.log(cartProduct);
-            var localCartItem = {}
-            if(cartEach.option == false){
-                localCartItem = {
-                    productName : cartProduct.productName,
-                    productid : cartProductDoc.id,
-                    price: cartProduct.price,
-                    defaultImage: cartProduct.images[0],
-                    cartQty : cartEach.cartQty,
-                    option: false,
-                    cartid: cartCollectionIds[i]
-                }
-                localTotal += localCartItem.price*localCartItem.cartQty;
-            }else{
-                localCartItem = {
-                    productName : cartProduct[cartEach.option].productFullName,
-                    productid : cartProductDoc.id,
-                    price: cartProduct[cartEach.option].price,
-                    defaultImage: cartProduct[cartEach.option].images[0],
-                    cartQty : cartEach.cartQty,
-                    option: cartEach.option,
-                    cartid: cartCollectionIds[i]
-                }
-                localTotal += localCartItem.price*localCartItem.cartQty;
-            }
-            }catch(er){continue;}
-            //console.log(localCartItem);
-            localCart.push(localCartItem);
-        }
-        setCart(localCart);
-        setTotal(localTotal);
-    }
+        if(!isLoaded(cartCollection)) return;
+        setCart(cartCollection);
+        var newTotal = cartCollection.reduce((tot,each)=>(tot+each.productPrice*each.cartQty),0)
+        console.log(total);
+        setTotal(newTotal);
+    },[cartCollection])
 
     const {updateCartAction, removeFromCart, cartMessageReset} = props;
     const updateCart = (cartid, qty)=>{
-        console.log('updateCart', cartid, qty);
-        var newcart = cart;
-        var index = cart.findIndex((each)=>each.cartid ==cartid);
-        newcart[index] = { ...newcart[index], cartQty: qty };
+        var newcart = cart.map((each)=>((each.id ==cartid)?({...each, cartQty:qty}):(each)));
+        var newTotal = newcart.reduce((tot,each)=>(tot+each.productPrice*each.cartQty),0)
+        setTotal(newTotal);
         setCart(newcart);
-        console.log(newcart);
         updateCartAction(cartid, qty);
     }
     const cartFunc={
         updateCart,
         removeFromCart
     }
-    const history = useHistory();
+
     const cartMessage =props?.cartUpdate?.cartMessage;
     
     useEffect(()=>{
@@ -118,8 +80,27 @@ function Cart(props) {
             </div>);
     const CartPageMarkUpJSX = (
             <div className="row">
-                {cartTotalSectionJSX}
-                {cartItemsJSX}
+                {(cart && cart.length>0)?(
+                    <Fragment>
+                        {cartTotalSectionJSX}
+                        {cartItemsJSX}
+                    </Fragment>
+                ):(
+                    <div className="center">
+                        <div className="row">
+                        <div className="col s8 m6 l6 offset-s2 offset-m3 offset-l3">
+                        <div className="card round-card">
+                        <div className="card-content">
+                            <p className="flow-text">
+                                Your Cart is Empty
+                            </p>
+                            <NavLink to='/store/all'><div className="btn dark_btn">Shop Now</div></NavLink>
+                        </div>    
+                        </div>    
+                        </div>
+                        </div>
+                    </div>
+                )}
             </div>
     )
 
@@ -127,17 +108,31 @@ function Cart(props) {
         <div className="Cart">
             <div className="container">
                 <h5 className="primary-green-dark-text">Your Shopping <span className="heavy_text">Cart</span></h5>
-                <Delayed waitBeforeShow={3000}>
-                    {(cart)
-                    ?(CartPageMarkUpJSX)
-                    :( <p>Your Shopping Cart is Empty</p> )}
-                </Delayed>
+                {(authuid!='default')?(
+                    <Delayed waitBeforeShow={5000} >
+                        {CartPageMarkUpJSX}
+                    </Delayed>
+                ):(
+                    <div className="center">
+                        <div className="row">
+                        <div className="col s8 m6 l6 offset-s2 offset-m3 offset-l3">
+                        <div className="card round-card">
+                        <div className="card-content">
+                            <p className="flow-text">
+                                Please <span className="heavy_text primary-green-dark-text">SignIn</span> To Continue
+                            </p>
+                        </div>    
+                        </div>    
+                        </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )
 }
 const mapStateToProps = (state)=>{
-    //console.log(state);
+    console.log(state);
     return{
         cartUpdate: state.cartUpdate,
         authuid : state.firebase.auth.uid

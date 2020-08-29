@@ -17,17 +17,14 @@ export const updateCartAction = (cartid, cartQty)=>{
     }
 }
 
-export const addToCartAction = (productid, option, cartQty)=>{
+export const addToCartAction = (newProduct)=>{
     return (dispatch,getState,{getFirebase,getFirestore})=>{
         dispatch({type:'CART_UPDATING'});
+        const {productid, option} = newProduct;
         const firestore = getFirestore();
         const authuid = getState().firebase.auth.uid;
         var doc = (option)?(productid+'-'+option):(productid+'-'+'default');
-        firestore.collection('/users').doc(authuid).collection('/cart').doc(doc).set({
-            cartItemRef: productid,
-            cartQty: parseInt(cartQty),
-            option: option?(option):false
-        })
+        firestore.collection('/users').doc(authuid).collection('/cart').doc(doc).set(newProduct)
         .then(()=>{
             return dispatch({type:'CART_UPDATED'});
         })

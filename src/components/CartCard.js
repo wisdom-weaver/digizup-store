@@ -7,7 +7,8 @@ import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 function CartCard(props) {
-    const { productName, price, defaultImage, cartQty, cartid, productid, option } = props?.cartItem
+    const { productName, productPrice, defaultImage, cartQty, productid, option, id } = props?.cartItem
+    const cartid = id;
     const [locCartQty,setLocCartQty] = useState(cartQty);
     const { updateCart, removeFromCart } = props?.cartFunc
     const {cartMessage,cartCount} = props?.cartUpdate;
@@ -37,7 +38,7 @@ function CartCard(props) {
             >
               <div className="card-info">
                 <p onClick={redirectToProductPage} >{productName}</p>
-                <p className="flow-text regular_text primary-green-dark-text right-align">{priceFormat(price)}</p>
+                <p className="flow-text regular_text primary-green-dark-text right-align">{priceFormat(productPrice)}</p>
               </div>
               <div className="cart-management">
                     

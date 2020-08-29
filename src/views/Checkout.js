@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import 'materialize-css';
 import { Collapsible, CollapsibleItem, Icon, Modal, Button } from 'react-materialize';
 import queryString from 'query-string';
@@ -6,33 +6,22 @@ import { compose } from 'redux';
 import { connect, useSelector } from 'react-redux';
 import { withRouter, useHistory } from 'react-router-dom';
 import { v1 as uuid, parse } from "uuid";
-import { isLoaded, useFirestoreConnect, useFirebaseConnect } from 'react-redux-firebase';
+import { isLoaded, useFirestoreConnect, useFirebaseConnect, useFirestore } from 'react-redux-firebase';
 import { db } from '../config/FirebaseConfig';
+import { addAddressAction, addCardAction, placeOrderAction } from '../store/actions/checkoutActions';
+import Delayed from '../utils/Delayed';
 
 function Checkout(props) {
-    // console.log(props);
+    
+    const authuid = useSelector(state=> state.firebase.auth.uid ) ?? 'default';
     const history = useHistory();
-    // var query = queryString.parse(props?.location?.search);
-    // console.log('query.stage',query.stage);
-    var [stage, setStage] = useState( parseInt(1) );
-    // var [stage, setStage] = useState( parseInt(query?.stage ?? 1) );
-    // console.log('query', query, 'stage', stage);
-    const selectStage = (newStage)=>{
-        newStage = parseInt(newStage);
-        if(newStage>5) {setStage(5); return;}
-        if(newStage<1) { setStage(1); return; }
-        setStage(newStage);
-        // history.push('/checkout?stage='+newStage);
-        // query = queryString.parse(props?.location?.search);
-    }
-    // useEffect(()=>{
-        // console.log('query',query);
-        // console.log('effq',query.stage);
-        // if( !query.stage ) history.push('/checkout?stage='+stage);
-        // setStage(parseInt(query.stage));
-    // },[query])
-
-    const authuid = useSelector(state=> state.firebase.auth.uid);
+    useEffect(()=>{
+        if(!authuid || authuid == 'default'){
+            setTimeout(()=>{
+                // history.push('/login');
+            },3000)
+        }
+    },[authuid])
     useFirestoreConnect([{
         collection: 'users',
         doc: authuid,
@@ -41,104 +30,118 @@ function Checkout(props) {
     },{
         collection: 'users',
         doc: authuid,
-        subcollections: [{collection:'savedAddresses'}],
-        storeAs: 'savedAddresses'
+        subcollections: [{collection:'addresses'}],
+        storeAs: 'addresses'
     },{
         collection: 'users',
         doc: authuid,
-        subcollections: [{collection:'savedCards'}],
-        storeAs: 'savedCards'
+        subcollections: [{collection:'cards'}],
+        storeAs: 'cards'
     }]);
+    const addAddress = props?.addAddress;
+    const addCard = props?.addCard;
+    const placeOrder = props?.placeOrder;
 
-    const cartCollection = useSelector(state=>state.firestore.ordered.cart);
-    const savedAddresses = useSelector(state=> state.firestore.ordered.savedAddresses);
-    const savedCards = useSelector(state=> state.firestore.ordered.savedCards) ;
-    const cartCollectionObj = useSelector(state=>state.firestore.data.cart);
-
-    const [cart, setCart] = useState();
-    const [total, setTotal] = useState(0)
+    const cart =  useSelector(state=> state.firestore.ordered.cart) ?? []
     useEffect(()=>{
-        if(!isLoaded(cartCollection) || !isLoaded(cartCollectionObj)) return;
-        if(!cartCollection || !cartCollectionObj){ setCart([]); setTotal(0); return;}
-        getCart();
-    },[cartCollection,cartCollectionObj])
-    useEffect(() => {
-        if(!isLoaded(savedCards)) return;
-        else console.log('savedCards loaded', savedCards);
-    }, [savedCards])
-    useEffect(() => {
-        if(!isLoaded(savedAddresses)) return;
-        else console.log('savedAddresses loaded', savedAddresses);
-    }, [savedAddresses])
-    const getCart = async ()=>{
-        //console.log('getcart', cartCollection);
-        var localCart = [];
-        var localTotal = 0;
-        var cartCollectionIds = Object.keys(cartCollectionObj);
-        for(let i=0;i<cartCollection.length;i++){
-            //console.log(i);
-            try{
-                var cartEach = cartCollection[i];
-            //console.log(cartEach);
-            var cartProductDoc = await db.collection('products').doc(cartEach?.cartItemRef).get();
-            if(cartProductDoc.empty){ /* console.log('product doc not found'); */ continue;}
-            var cartProduct = cartProductDoc.data();
-            //console.log(cartProduct);
-            var localCartItem = {}
-            if(cartEach.option == false){
-                localCartItem = {
-                    productName : cartProduct.productName,
-                    productid : cartProductDoc.id,
-                    price: cartProduct.price,
-                    defaultImage: cartProduct.images[0],
-                    cartQty : cartEach.cartQty,
-                    option: false,
-                    cartid: cartCollectionIds[i]
-                }
-                localTotal += localCartItem.price*localCartItem.cartQty;
-            }else{
-                localCartItem = {
-                    productName : cartProduct[cartEach.option].productFullName,
-                    productid : cartProductDoc.id,
-                    price: cartProduct[cartEach.option].price,
-                    defaultImage: cartProduct[cartEach.option].images[0],
-                    cartQty : cartEach.cartQty,
-                    option: cartEach.option,
-                    cartid: cartCollectionIds[i]
-                }
-                localTotal += localCartItem.price*localCartItem.cartQty;
-            }
-            }catch(er){continue;}
-            //console.log(localCartItem);
-            localCart.push(localCartItem);
+        // console.log('cart',cart)
+        if(cart.length>0){
+            var localTotal = cart.reduce((acc,each)=>(acc+each.productPrice*each.cartQty),0);
+            setTotal(localTotal);
         }
-        setCart(localCart);
-        setTotal(localTotal);
-    }
+    },[cart]);
+
+    const addresses = useSelector(state=> state.firestore.ordered.addresses) ?? [];
+    useEffect(()=>{ 
+        // console.log('addresses',addresses);
+        if(!addresses || addresses.length==0) return;
+        if(addressIndex==-1){setAddressIndex(0); }
+    },[addresses]);
+
+    const cards = useSelector(state=> state.firestore.ordered.cards) ?? [];
+    useEffect(()=>{ 
+        console.log('cards',cards);
+        if(!cards || cards.length==0) return;
+        if(cardIndex == -1) setCardIndex(0);
+    },[cards]);
     
-    var [deliveryLocationIndex, setDeliverLocationIndex] = useState(0);
-    const [newAddress, setNewAddress] = useState({
-        fullName    :'',
-        addressLine :'',
-        city    :'',
-        state   :'',
-        country :'',
-        pincode :'',
-        phoneNo :''
-    });
+    const [total,setTotal] = useState(0);
+
+    useEffect(()=>{},[cart, addresses, cards])
+
+    const initAddress = { fullName    :'', addressLine :'', city    :'', state   :'', country :'', pincode :'', phoneNo :'' }
+    const [newAddress, setNewAddress] = useState(initAddress);
+    const [addressIndex, setAddressIndex] = useState(-1);
+    var [paymentModeIndex, setPaymentModeIndex] = useState(4);
+    var [cardIndex, setCardIndex] = useState(-1);
+    var initCard = { cardHolderName: '', cardNo: '', cardExpMM: '', cardExpYY: '' };
+    const [newCard, setNewCard] = useState(initCard);
+    useEffect(()=>{
+        console.log({addressIndex});
+    },[addressIndex]);
+    useEffect(()=>{
+        console.log({cardIndex});
+    },[cardIndex]);
+    const submitNewAddress = ()=>{
+        addAddress(newAddress);
+        setNewAddress(initAddress);
+    }
+    const submitAddress = ()=>{
+        console.log({addresses,addressIndex});
+        if(addressIndex < 0) return;
+        else{setStage(1);}
+    }
+
+    const submitNewCard = (newCard)=>{
+        addCard(newCard);
+        setNewCard(initCard);
+    } 
+
+    const submitPaymentMode = ()=>{
+        console.log('paymentModeIndex', paymentModeIndex, 'cardIndex', cardIndex);
+        if(paymentModeIndex == 0 && cardIndex > -1) setStage(2);
+        if(paymentModeIndex > 0) setStage(2);
+    }
+    const proceedToPayment= ()=>{
+        setStage(3);
+    }
+
+    const payNow = ()=>{
+        if(addressIndex< 0 )return;
+        if(paymentModeIndex< 0 )return;
+        if(paymentModeIndex == 0 && cardIndex < 0)return;
+        var order = { 
+            cart: cart,
+            total: total,
+            address:addresses[addressIndex],
+            paymentType: paymentModes[paymentModeIndex].paymentType,
+        }
+        if(paymentModeIndex ==0 && cardIndex > -1){
+            order = {...order, card:{cardHolderName: cards[cardIndex].cardHolderName, cardNo: 'XXXX XXXX XXXX '+cards[cardIndex].cardHolderName.slice(12)}
+            }
+        }else{
+            order = {...order}
+        }
+        placeOrder(order);
+    }
+
     const deliverySectionJSX = (
-        <div className="checkout-delivery-section">
-        {/* 1=> delivery addresses and speeds */}
-            {/* {savedAddresses Cards} */}
-            <h6 className="center-align">Choose Your Delivery Location</h6>
-            <div className="row"> 
-                {isLoaded(savedAddresses) && savedAddresses && savedAddresses.map((eachLoc,index)=>(
-                    <div key={uuid()} className="col s6 m6 l4">
-                    <div className="card round-card" onClick={()=>{setDeliverLocationIndex(index)}} >
+        <div className="deliverySection">
+            <h4 className="center">Select Your Delivery Location</h4>
+            <div className="row">
+                { (!addresses && addresses.length ==0)?(
+                    <p className="center">
+                        No saved Address found.
+                        <br />Please add atleast one.
+                    </p>
+                ):(null)}
+                { addresses && addresses.map((eachLoc,index)=>(
+                <div key={uuid()} className="col s6 m6 l4">
+                    <div  onClick={()=>{setAddressIndex(index)}} className="card round-card">
                         <div className="card-content">
                             <p className="flow-text"> 
                             <label>
-                              <input name="addressGroup" type="radio" checked={(index == deliveryLocationIndex)} />
+                              <input name="addressGroup" type="radio" checked={(index == addressIndex)} />
                               <span className="primary-green-dark-text heavy_text">{eachLoc.fullName}</span>
                             </label>
                              </p>
@@ -146,15 +149,15 @@ function Checkout(props) {
                             <p>{eachLoc.city}, {eachLoc.state}-{eachLoc.pincode}</p>
                             <p>{eachLoc.country}</p>
                         </div>
-                    </div>
-                    </div>
-                ))}
+                    </div>   
+                </div>
+                )) }
                 <div className="col s12"></div>
                 <div className="col s12 m6 center">
                     <Modal
                       actions={[
                         (<Button flat modal="close" node="button" waves="red">Close</Button>),
-                        (<Button onClick={()=>{console.log(newAddress)}} flat modal="close" node="button" waves="green">Add Address</Button>)
+                        (<Button onClick={()=>{submitNewAddress(newAddress)}} flat modal="close" node="button" waves="green">Add Address</Button>)
                       ]}
                       bottomSheet={false}
                       fixedFooter={true}
@@ -214,120 +217,123 @@ function Checkout(props) {
                     </Modal>
                 </div>
                 <div className="col s12 m6 center">
-                    <div onClick={()=>{selectStage(2)}} className="btn dark_btn">Select Address</div>
+                    {
+                    (!addresses || addresses.length ==0)?(
+                        <div className="btn dark_btn disabled">Select Address</div>
+                    ):(
+                        <div onClick={()=>{submitAddress()}} className="btn dark_btn">Select Address</div>
+                    )
+                    }
                 </div>
             </div>
-            {/* 1.1=> for new address */}
         </div>
-    );
+    )
     
-    
-   var [savedCardIndex, setSavedCardIndex] = useState(0);
-   const [newCard, setNewCard] = useState({
-    cardHolderName  : '',
-    cardNo          : '',
-    cardExpMM       : '',
-    cardExpYY       : ''
-   })
-   
-    var paymentModes = [
-        { paymentModeHead:"Credit / Debit Card",             paymentModeIcon:'payment',      paymentModeInner:(
-            <div>
-                <p>we accept  VISA, MasterCard and Western Union credit/debit cards only.* </p> 
-                <p>Saved Cards:</p>
-                <div className="row">
-                    {isLoaded(savedCards) && savedCards  && savedCards.map((card,index)=>(
-                        <div className="col s12 m6">
-                            <div className="card round-card"
-                            onClick={()=>{setSavedCardIndex(index)}} 
-                            >
-                                <div className="card-content">
-                                    <label>
-                                        <input name="savedCardsGroup" type="radio" checked={( index == savedCardIndex )} />
-                                        <span></span>
-                                    </label>
-                                    {/* {card?( */}
-                                        {/* <div> */}
-                                            {/* <p>Card Holder: {card.cardHolderName}</p> */}
-                                            {/* <p>Card No: {'XXXX XXXX XXXX '+card.cardNo.slice(12)}</p> */}
-                                            {/* <p>Card Expiry: { card.cardExpMM+'/'+card.cardExpYY }</p> */}
-                                        {/* </div> */}
-                                    {/* ):(null)} */}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                     <div className="col s12"></div>
-                <div className="col s12 m6 center">
-                    <Modal
-                      actions={[
-                        (<Button flat modal="close" node="button" waves="red">Close</Button>),
-                        (<Button onClick={()=>{console.log(newCard); }} flat modal="close" node="button" waves="green">Add Address</Button>)
-                      ]}
-                      bottomSheet={false}
-                      fixedFooter={true}
-                      header="Add a new Address"
-                      id="addAddressModal"
-                      open={false}
-                      options={{
-                        dismissible: true,
-                        endingTop: '16%',
-                        inDuration: 250,
-                        onCloseEnd: null,
-                        onCloseStart: null,
-                        onOpenEnd: null,
-                        onOpenStart: null,
-                        opacity: 0.5,
-                        outDuration: 250,
-                        preventScrolling: true,
-                        startingTop: '55%'
-                      }}
-                    //   root={[object HTMLBodyElement]}
-                      trigger={<div className="btn light_btn"> <i className="material-icons">add</i> <span>Add Address</span> </div>}
-                    >
-                        <div className="row">
-                            <div className="input-field col s12">
-                                <i className="material-icons prefix">account_circle</i>
-                                <input onChange={(e)=>{setNewCard({...newCard, cardHolderName:e.target.value})}} value={newCard.cardHolderName} id="cardHolderName-addCard" type="text" required />
-                                <label  htmlFor="cardHolder-addCard">Full Name</label>
-                            </div>
-                            <div className="input-field col s8">
-                                <i className="material-icons prefix">payment</i>
-                                <input onChange={(e)=>{setNewCard({...newCard, cardNo:e.target.value})}} value={newCard.cardNo} id="cardNo-addCard" type="text" required />
-                                <label htmlFor="cardNo-addCard">Card Line</label>
-                                {/* <NumberFormat customInput={TextField} format="#### #### #### ####"/> */}
-                            </div>
-                            <div className="input-field col s2">
-                                <input onChange={(e)=>{setNewCard({...newCard, cardExpMM:e.target.value})}} value={newCard.cardExpMM} id="cardExpMM-addCard" type="text" required />
-                                <label htmlFor="cardExpMM-addCard">MM</label>
-                            </div>
-                            <div className="input-field col s2">
-                                <input onChange={(e)=>{setNewCard({...newCard, cardExpYY:e.target.value})}} value={newCard.cardExpYY} id="cardExpYY-addCard" type="text" required />
-                                <label htmlFor="cardExpYY-addCard">YY</label>
-                            </div>
-                        </div>
-                    </Modal>
-                </div>
-                </div>
-            </div>
-        ) },
-
-        { paymentModeHead:"Crypto Currencies",               paymentModeIcon:'fingerprint',  paymentModeInner:( <p>coinbase e-commerce * </p> ) },
-
-        { paymentModeHead:"PayPal",                          paymentModeIcon:'filter_drama', paymentModeInner:( <p>paypal Integration* </p> ) },
-
-        { paymentModeHead:"Paytm",                           paymentModeIcon:'filter_drama', paymentModeInner:( <p>paytm Integration* </p> ) },
-
-        { paymentModeHead:"COD/POD (Cash/Pay On Delivery)",  paymentModeIcon:'attach_money', paymentModeInner:( <p>we acccept cash aswell as digital payment options on your door step </p> ) }
-
-    ]
-
-    var [paymentModeIndex, setPaymentModeIndex] = useState(4);
-
+     var paymentModes = [
+         {  paymentType :'card', paymentModeHead:"Credit / Debit Card",             paymentModeIcon:'payment',      paymentModeInner:(
+             <div>
+                 <p>We accept  VISA, MasterCard and Western Union credit/debit cards only.* </p> 
+                 <div className="row">
+                    {(!cards || cards.length == 0 )?(
+                        <p className="center">
+                            No Saved Card Found
+                            Please add atleast one.
+                        </p>
+                    ):(
+                        <Fragment>
+                            <p className="flow-text center">Saved Cards: </p>
+                            {cards.map((card,index)=>(
+                             <div className="col s12 m6">
+                                 <div className="card round-card"
+                                 onClick={()=>{setCardIndex(index)}} 
+                                 >
+                                     <div className="card-content">
+                                         <label>
+                                             <input name="cardsGroup" type="radio" checked={( index == cardIndex )} />
+                                             <span></span>
+                                         </label>
+                                         {card?(
+                                            <div>
+                                                <p>Card Holder: {card.cardHolderName}</p>
+                                                <p>Card No: {'XXXX XXXX XXXX '+card.cardNo.slice(12)}</p>
+                                                <p>Card Expiry: { card.cardExpMM+'/'+card.cardExpYY }</p>
+                                            </div>
+                                         ):(null)}
+                                     </div>
+                                 </div>
+                             </div>
+                            ))}
+                        </ Fragment>  
+                    )}
+                    <div className="col s12"></div>
+                    <div className="col s12 m6 center">
+                     <Modal
+                       actions={[
+                         (<Button flat modal="close" node="button" waves="red">Close</Button>),
+                         (<Button onClick={()=>{ submitNewCard(newCard) }} flat modal="close" node="button" waves="green">Add Card</Button>)
+                       ]}
+                       bottomSheet={false}
+                       fixedFooter={true}
+                       header="Add a new Address"
+                       id="addAddressModal"
+                       open={false}
+                       options={{
+                         dismissible: true,
+                         endingTop: '16%',
+                         inDuration: 250,
+                         onCloseEnd: null,
+                         onCloseStart: null,
+                         onOpenEnd: null,
+                         onOpenStart: null,
+                         opacity: 0.5,
+                         outDuration: 250,
+                         preventScrolling: true,
+                         startingTop: '55%'
+                       }}
+                     //   root={[object HTMLBodyElement]}
+                       trigger={<div className="btn light_btn"> <i className="material-icons">add</i> <span>Add Card</span> </div>}
+                     >
+                         <div className="row">
+                             <div className="input-field col s12">
+                                 <i className="material-icons prefix">account_circle</i>
+                                 <input onChange={(e)=>{setNewCard({...newCard, cardHolderName:e.target.value})}} value={newCard.cardHolderName} id="cardHolderName-addCard" type="text" required />
+                                 <label  htmlFor="cardHolder-addCard">Full Name</label>
+                             </div>
+                             <div className="input-field col s8">
+                                 <i className="material-icons prefix">payment</i>
+                                 <input onChange={(e)=>{setNewCard({...newCard, cardNo:e.target.value})}} value={newCard.cardNo} id="cardNo-addCard" type="text" required />
+                                 <label htmlFor="cardNo-addCard">Card Line</label>
+                                 {/* <NumberFormat customInput={TextField} format="#### #### #### ####"/> */}
+                             </div>
+                             <div className="input-field col s2">
+                                 <input onChange={(e)=>{setNewCard({...newCard, cardExpMM:e.target.value})}} value={newCard.cardExpMM} id="cardExpMM-addCard" type="text" required />
+                                 <label htmlFor="cardExpMM-addCard">MM</label>
+                             </div>
+                             <div className="input-field col s2">
+                                 <input onChange={(e)=>{setNewCard({...newCard, cardExpYY:e.target.value})}} value={newCard.cardExpYY} id="cardExpYY-addCard" type="text" required />
+                                 <label htmlFor="cardExpYY-addCard">YY</label>
+                             </div>
+                         </div>
+                     </Modal>
+                    </div>
+                 </div>
+             </div>
+         ) },
+ 
+         { paymentType:'crypto', paymentModeHead:"Crypto Currencies",               paymentModeIcon:'fingerprint',  paymentModeInner:( <p>coinbase e-commerce * </p> ) },
+ 
+         { paymentType:'paypal', paymentModeHead:"PayPal",                          paymentModeIcon:'filter_drama', paymentModeInner:( <p>paypal Integration* </p> ) },
+ 
+         { paymentType:'paytm', paymentModeHead:"Paytm",                           paymentModeIcon:'filter_drama', paymentModeInner:( <p>paytm Integration* </p> ) },
+ 
+         { paymentType:'cod', paymentModeHead:"COD/POD (Cash/Pay On Delivery)",  paymentModeIcon:'attach_money', paymentModeInner:( <p>we acccept cash aswell as digital payment options on your door step </p> ) }
+ 
+     ]
+ 
     const paymentModesSectionJSX = (
         <div className="checkout-payment-modes-section">
             {/* 2=> payment option */}
-            <h6 className="center">Select Your Payment Method</h6>
+            <h4 className="center">Select Your Payment Option</h4>
             <Collapsible>
                 {paymentModes.map((mode,index)=>(
                 <CollapsibleItem
@@ -350,36 +356,51 @@ function Checkout(props) {
                 ))}
             </Collapsible>
             <div className="center">
-                <div onClick={()=>{selectStage(3)}} className="btn dark_btn">Order Summary</div>
+                {(paymentModeIndex ==0 && cardIndex==-1)?(
+                    <div className="btn dark_btn disabled">Order Summary</div>
+                ):(
+                    <div onClick={()=>{ submitPaymentMode()}} className="btn dark_btn">Order Summary</div>
+                )}
             </div>
         </div>
     )
-    
+
     const orderSummarySectionJSX = (
         <div className="checkout-order-summary-section">
         {/* 3=> order summary   */}
-            <div className="summary-delivery">
-                <p className="flow-text">Delivery Address:</p>
-                {((isLoaded(savedAddresses) && savedAddresses)?(
-                    <div>
-                        <p>{savedAddresses[deliveryLocationIndex].fullName}</p>
-                        <p>{savedAddresses[deliveryLocationIndex].addressLine}</p>
-                        <p>{savedAddresses[deliveryLocationIndex].city}, {savedAddresses[deliveryLocationIndex].state}-{savedAddresses[deliveryLocationIndex].pincode}</p>
-                        <p>{savedAddresses[deliveryLocationIndex].country}</p>
-                        <p>{savedAddresses[deliveryLocationIndex].phoneNo}</p>
+            <div className="summary-delivery-address">
+                <h6>Delivery Address:</h6>
+                {(addresses && addressIndex>-1)?(<div className="center">
+                    <div className="row">
+                        <div className="card col s8 m8 l6 round-card">
+                            <div className="card-content">
+                            {(addresses[addressIndex])?(
+                            <Fragment>
+                                <p className="heavy_text">{ addresses[addressIndex].fullName }</p>
+                                <p className="heavy_text">{ addresses[addressIndex].addressLine +'-'+ addresses[addressIndex].city}</p>
+                                <p className="heavy_text">{ addresses[addressIndex].state+'-'+addresses[addressIndex].pincode +', '+addresses[addressIndex].country}</p>
+                                <p className="heavy_text">{ addresses[addressIndex].phoneNo}</p>
+                            </Fragment>
+                            ):(null)}
+                            </div>
+                        </div>
                     </div>
-                ):(null))}
+                </div>):(null)}
             </div>
-            <br/><hr/><br/>
-            <div className="summary-payments">
-                <p className="flow-text">Payment Options: {paymentModes[paymentModeIndex].paymentModeHead}</p>
-                {( paymentModeIndex ==0 && savedCards && savedCardIndex)?(
-                    <div className="card-details">
-                        <p>Card Holder: {savedCards[savedCardIndex].cardHolderName}</p>
-                        <p>Card No: {'XXXX XXXX XXXX '+savedCards[savedCardIndex].cardNo?.slice(12)}</p>
-                        <p>Card Expiry: { savedCards[savedCardIndex].cardExpMM+'/'+savedCards[savedCardIndex].cardExpYY }</p>
+            <div className="summary-payment-mode">
+                <h6>Payment Option: <Icon>{paymentModes[paymentModeIndex].paymentModeIcon}</Icon> {paymentModes[paymentModeIndex].paymentModeHead}</h6>
+                {(paymentModeIndex==0 && cards && cardIndex> -1)?(
+                <div className="center">
+                    <div className="row">
+                        <div className="card col s8 m8 l6 round-card">
+                            <div className="card-content left-align">
+                                <p className="heavy_text">Card Holder: {cards[cardIndex].cardHolderName}</p>
+                                <p className="heavy_text">Card Number: {'XXXX XXXX XXXX '+cards[cardIndex].cardNo.slice(12)}</p>
+                                <p className="heavy_text">Card Expiry: {cards[cardIndex].cardExpMM+'/'+cards[cardIndex].cardExpYY}</p>
+                            </div>
+                        </div>
                     </div>
-                ):(null)}
+                </div>):(null)}
             </div>
             <div className="summary-order-details">
                 <table>
@@ -387,74 +408,85 @@ function Checkout(props) {
                         <tr>
                             <td>Product</td> <td>Price/Qty</td> <td>Qty</td> <td>SubTotal</td>
                         </tr>
-                        { isLoaded(cartCollection) && cart && cart.map(item=>( 
+                        { cart && cart.map(item=>( 
                         <tr>
-                            <td>{item.productName}</td> <td>{item.price}</td> <td>{item.cartQty}</td> <td>{item.price*item.cartQty}</td>
+                            <td>{item.productName}</td> <td>{item.productPrice}</td> <td>{item.cartQty}</td> <td>{item.productPrice*item.cartQty}</td>
                         </tr> ))}
+                        <tr>
+                            <td></td> <td></td> <td className="heavy_text">Total</td> <td className="heavy_text">{total}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
             <div className="summary-payment-proceeding">
-                <div onClick={()=>{selectStage(4)}} className="btn dark_btn">Proceed To Payment</div>
+                <div onClick={()=>{proceedToPayment()}} className="btn dark_btn">Proceed To Payment</div>
             </div>
         </div>
     )
-    
-    const makePaymentSectionJSX = (
-        <div className="checkout-make-payment">
-            {/* 4=> make payment  */}
-            what ever integration to put in here;
-            <div className="btn dark_btn">Pay Now</div>
-        </div>
-    );
-    const resultSectionJSX = (
-        <div className="checkout-result">
-        {/* 5=> redirect To confirmation Page*/}
-            confirmation page
+
+    const integrationJSX = (
+        <div className="checkout-integration-section">
+            Integration
+            <div onClick={ ()=>{payNow()} } className="btn dark_btn">Pay Now</div>
         </div>
     )
-    const checkoutPage= {
-        '1':{ stageid:1, stageTitle: 'Delivery',      stateJSX: deliverySectionJSX },
-        '2':{ stageid:2, stageTitle: 'Payment Options',      stateJSX: paymentModesSectionJSX },
-        '3':{ stageid:3, stageTitle: 'Order Summary',  stateJSX: orderSummarySectionJSX },
-        '4':{ stageid:4, stageTitle: 'Make Payment',   stateJSX: makePaymentSectionJSX },
-        '5':{ stageid:5, stageTitle: 'Result',        stateJSX: resultSectionJSX },
-    }
-    return (
+    const checkoutResultJSX = (
+        <div className="checkout-integration-section">
+            <h5 className="center">Success!!</h5>
+        </div>
+    )
+    const [stage, setStage] = useState(0);
+    const checkout = [
+        deliverySectionJSX,
+        paymentModesSectionJSX,
+        orderSummarySectionJSX,
+        integrationJSX,
+        checkoutResultJSX
+    ]
+    return(
         <div className="Checkout Page">
             <div className="container">
-                <h4 className="stage_control_panel">
-                    <i onClick={()=>{selectStage(stage-1)}} className={"material-icons stage_arrow "+((stage==1)?('disabled'):(''))}>arrow_left</i>
-                    <span className="stage_title" >{(stage)?(checkoutPage[stage]?.stageTitle):(null)}</span>
-                    <i onClick={()=>{selectStage(stage+1)}} className={"material-icons stage_arrow "+((stage==5)?('disabled'):(''))}>arrow_right</i>
-                </h4>
-
-                {
-                    (stage)?(
-                        <div>
-                            {checkoutPage[stage].stateJSX}
+                {(authuid!='default')?(
+                    <Delayed waitBeforeShow={5000} >
+                        {checkout[stage]}
+                    </Delayed>
+                ):(
+                    <div className="center">
+                        <div className="row">
+                        <div className="col s8 m6 l6 offset-s2 offset-m3 offset-l3">
+                        <div className="card round-card">
+                        <div className="card-content">
+                            <p className="flow-text">
+                                Please <span className="heavy_text primary-green-dark-text">SignIn</span> To Continue
+                            </p>
+                        </div>    
+                        </div>    
                         </div>
-                    ):(null)
-                }
-                
+                        </div>
+                    </div>
+                )}
             </div>
+                
         </div>
     )
+
 }
 
 const mapStateToProps = (state)=>{
-    console.log('state',state);
-    return {
-
-    }
+    // console.log('state-checkout',state);
+    return { }
 }
 
 const mapDispatchToProps = (dispatch)=>{
-    return{
-
+    return{ 
+        addAddress : (newAddress)=>{ dispatch(addAddressAction(newAddress)) },
+        addCard : (newCard)=>{ dispatch( addCardAction(newCard) ) },
+        placeOrder : (newOrder)=>{ dispatch( placeOrderAction(newOrder) ) }
     }
 }
 
-export default compose(
-    connect(mapStateToProps, mapDispatchToProps)
+export default 
+compose(
+    connect(mapStateToProps,mapDispatchToProps),
+    withRouter
 )(Checkout)

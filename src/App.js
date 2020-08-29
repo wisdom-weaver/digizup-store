@@ -11,6 +11,7 @@ import Signup from './views/Signup';
 import Product from './views/Product';
 import Test from './views/Test';
 import ScrollToTop from './utils/ScrollToTop';
+import Category from './views/Category';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Switch>
             <Route exact path="/about"> <About /> </Route>
             <Route exact path="/store"> <Store /> </Route>
+            <Route exact path="/store/:category"> <Category /> </Route>
             <Route exact path="/cart"> <Cart /> </Route>
             <Route exact path="/checkout"> <Checkout /> </Route>
             <Route exact path="/login"> <Login /> </Route>

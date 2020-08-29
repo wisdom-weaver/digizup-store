@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { NavLink, useHistory, withRouter } from 'react-router-dom'
 import {v1 as uuid} from 'uuid';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 
 import Cart from "@material-ui/icons/AddShoppingCart";
 import Close from '@material-ui/icons/CloseRounded';
@@ -11,7 +11,7 @@ import $ from 'jquery'
 import M from 'materialize-css';
 import { Dropdown, Button, Divider, Collapsible, CollapsibleItem, Icon } from "react-materialize";
 
-import { firebaseConnect, firestoreConnect } from 'react-redux-firebase';
+import { firebaseConnect, firestoreConnect, useFirestoreConnect } from 'react-redux-firebase';
 import { compose } from 'redux';
 import { logoutAction } from '../store/actions/authActions';
 import { searchAction, searchResetAction } from '../store/actions/searchActions';
@@ -21,6 +21,8 @@ import _ from 'lodash';
 function Navbar(props) {
     const { auth,profile, logout, search, searchReset} = props ;
     const [categories, setCategories] = useState(null);
+    const history = useHistory()
+    const [cartCount,setCartCount] = useState(0);
     useEffect(()=>{
       if(!props?.categories) return;
       // console.log(props.categories);
@@ -33,8 +35,18 @@ function Navbar(props) {
       setCategories(sortedCategories);
     },[props.categories])
     
-    
-    const history = useHistory()
+    const authuid = useSelector(state=> state.firebase.auth.uid ) ?? 'default';
+    useFirestoreConnect([{
+        collection: 'users',
+        doc: authuid,
+        subcollections: [{collection:'cart'}],
+        storeAs: 'cart'
+    }]);
+    const cart =  useSelector(state=> state.firestore.ordered.cart) ?? []
+    useEffect(()=>{
+      var localCartCount = cart.reduce((tot,each)=>(tot+each.cartQty),0);
+      setCartCount(localCartCount);
+    },[cart])
 
     const [menuOpenState, setMenuOpenState] = useState(false);
     const [category, setCategory] = useState('All');
@@ -136,7 +148,7 @@ function Navbar(props) {
     return (
         <div className="Navbar">
           <NavLink onClick={()=>{setMenuOpenState(false)}} className="link cart-link" to="/cart"> 
-            <span className="cart_items_count">22</span>
+            <span className="cart_items_count">{cartCount}</span>
           </NavLink>
           <nav>
               <div className="nav__left">
