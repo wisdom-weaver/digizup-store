@@ -9,12 +9,12 @@ import { firestoreConnect } from 'react-redux-firebase';
 import ProductCard from '../components/ProductCard';
 import {v1 as uuid } from 'uuid';
 import queryString from 'query-string'
-import { withRouter } from 'react-router-dom';
+import { withRouter, useHistory } from 'react-router-dom';
 import { searchAction, searchResetAction } from '../store/actions/searchActions';
 
 
 function Store(props) {
-    // console.log('props', props);
+    const history = useHistory();
     var query = queryString.parse(props?.location?.search)
     const searchTerm =query?.searchTerm ?? ''; 
     const category =query?.category ?? 'All'; 
@@ -23,7 +23,11 @@ function Store(props) {
     const {searchError, searchResults, searchMessage} = search;
     useEffect(()=>{
       searchReset();
-      searchAction(searchTerm,category);
+      if(searchTerm == ''){
+        history.push('/store/all');
+      }else{
+        searchAction(searchTerm,category);
+      }
     },[searchTerm,category])
     useEffect(()=>{
       console.log("searchState=>",{searchMessage, searchError, searchResults});

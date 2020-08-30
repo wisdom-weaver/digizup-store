@@ -115,9 +115,12 @@ function Checkout(props) {
             total: total,
             address:addresses[addressIndex],
             paymentType: paymentModes[paymentModeIndex].paymentType,
+            consumeruid: authuid,
+            cartCount: cart.reduce((tot,each)=>(tot+each.cartQty),0)??0,
+            defaultImage: cart[0].defaultImage
         }
         if(paymentModeIndex ==0 && cardIndex > -1){
-            order = {...order, card:{cardHolderName: cards[cardIndex].cardHolderName, cardNo: 'XXXX XXXX XXXX '+cards[cardIndex].cardHolderName.slice(12)}
+            order = {...order, card:{cardHolderName: cards[cardIndex].cardHolderName, cardNo: 'XXXX XXXX XXXX '+cards[cardIndex].cardNo.slice(12)}
             }
         }else{
             order = {...order}

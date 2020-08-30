@@ -42,6 +42,12 @@ function Navbar(props) {
         subcollections: [{collection:'cart'}],
         storeAs: 'cart'
     }]);
+    useFirestoreConnect([{
+      collection: 'users',
+      doc: authuid,
+      subcollections: [{collection:'orders'}],
+      storeAs: 'orders'
+    }]);
     const cart =  useSelector(state=> state.firestore.ordered.cart) ?? []
     useEffect(()=>{
       var localCartCount = cart.reduce((tot,each)=>(tot+each.cartQty),0);
@@ -169,7 +175,7 @@ function Navbar(props) {
 
               {
                 (auth?.uid)?(
-                  <ul className="hide-on-med-and-down">
+                  <ul className="hide-on-med-and-down row-flex-center">
                     <li><NavLink onClick={()=>{setMenuOpenState(false)}} className="link" to="/store">Store</NavLink></li>
                     <li><NavLink onClick={()=>{setMenuOpenState(false)}} className="nav_user_block_link" to="/account">
                     <div className="nav_user_block">
@@ -179,7 +185,7 @@ function Navbar(props) {
                     </NavLink></li>
                   </ul>
                 ):(
-                  <ul className="hide-on-med-and-down">
+                  <ul className="hide-on-med-and-down row-flex-center">
                     <li><NavLink onClick={()=>{setMenuOpenState(false)}} className="link" to="/store">Store</NavLink></li>
                     <li><NavLink onClick={()=>{setMenuOpenState(false)}} className="btn login_btn" to="/login">Login</NavLink></li>
                     <li><NavLink onClick={()=>{setMenuOpenState(false)}} className="btn signup_btn" to="/signup">Signup</NavLink></li>

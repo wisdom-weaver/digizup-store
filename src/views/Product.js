@@ -140,6 +140,27 @@ function Product(props) {
         }
     },[cartMessage])
 
+    const authuid = useSelector((state)=>state.firebase.auth.uid) ?? 'default';
+
+    const addingToCart = ()=>{
+        console.log('adding to cart');
+        var newProduct = {
+            cartQty      : cartQuantity,
+            defaultImage : renderedProduct.images[0] ?? '',
+            option       : productOption ?? false,
+            productName  : renderedProduct.productName,
+            productPrice : renderedProduct.price,
+            productid    : productid ?? null ,
+            createdAt    : new Date()
+        }
+        if(!authuid || authuid =='default'){
+            alert('Please Login to add this item to cart');
+            history.push('/login');
+        }else{
+            addToCart(newProduct);
+            history.push('/cart');
+        }
+    }
 
     const options = {
         items: 1,
@@ -213,20 +234,7 @@ function Product(props) {
                                 <div onClick={()=>{handleCartUpdate(cartQuantity+1)}} className="btn-floating quantity-adjustment-btn"> <i className="material-icons">add_circle</i> </div>
                             </div>
                             <div 
-                                onClick={(e)=>{
-                                    console.log('adding to cart');
-                                    var newProduct = {
-                                        cartQty      : cartQuantity,
-                                        defaultImage : renderedProduct.images[0] ?? '',
-                                        option       : productOption ?? false,
-                                        productName  : renderedProduct.productName,
-                                        productPrice : renderedProduct.price,
-                                        productid    : productid ?? null ,
-                                        createdAt    : new Date()
-                                    }
-                                    addToCart(newProduct);
-                                    history.push('/cart');
-                                }}
+                                onClick={()=>{ addingToCart() }}
                                 className="btn btn add-to-cart-btn"
                             > <i className="material-icons">add_shopping_cart</i> Add to Cart</div>
                         </div>

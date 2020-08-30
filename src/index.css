@@ -15,6 +15,38 @@ body {
   font-weight: 400;
 }
 
+.row-flex-center {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.col-flex-center {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
 .round-card {
   border-radius: 40px;
   -webkit-box-shadow: none !important;
@@ -82,11 +114,15 @@ th::selection {
      object-fit: contain;
 }
 
+.no-wrap {
+  white-space: nowrap;
+}
+
 .light_text {
   font-weight: 300;
 }
 
-.regular_text {
+.regular_text, .green-chip {
   font-weight: 500;
 }
 
@@ -216,7 +252,7 @@ th::selection {
   cursor: not-allowed !important;
 }
 
-.red_btn, .CartCard .remove_btn {
+.red_btn, .CartCard .remove_btn, .OrderCard .remove_btn {
   background-color: #f84b4b !important;
   border-radius: 10px !important;
   -webkit-box-shadow: none;
@@ -231,8 +267,13 @@ th::selection {
   margin: 5px;
 }
 
-.red_btn:hover, .CartCard .remove_btn:hover {
+.red_btn:hover, .CartCard .remove_btn:hover, .OrderCard .remove_btn:hover {
   background-color: #20927F !important;
+}
+
+.green-chip {
+  background: #CDDDDA !important;
+  color: #065446;
 }
 
 .trans-green-btn, .Product .product-each-option-element {
@@ -258,6 +299,11 @@ th::selection {
   padding: 20px;
   width: 100%;
   max-width: 500px;
+}
+
+.text-link {
+  color: #065446;
+  cursor: pointer;
 }
 
 .Navbar nav {
@@ -962,7 +1008,7 @@ th::selection {
   border-radius: 15px;
 }
 
-.CartCard .card {
+.CartCard .card, .OrderCard .card {
   border-radius: 20px;
   overflow: hidden;
   margin: 0px;
@@ -971,14 +1017,14 @@ th::selection {
   margin-bottom: 10px;
 }
 
-.CartCard .card-image {
+.CartCard .card-image, .OrderCard .card-image {
   max-height: 200px;
-  max-width: 200px;
+  max-width: 200px !important;
   min-height: 200px;
   min-width: 200px;
 }
 
-.CartCard .card-image img {
+.CartCard .card-image img, .OrderCard .card-image img {
   padding: 20px;
   max-height: 200px;
   max-width: 200px;
@@ -988,13 +1034,13 @@ th::selection {
      object-fit: contain;
 }
 
-.CartCard .quantity-selection-container {
+.CartCard .quantity-selection-container, .OrderCard .quantity-selection-container {
   background: rgba(32, 146, 127, 0.2);
   border-radius: 30px;
   padding: 0px 10px;
 }
 
-.CartCard .product-quantity-selection {
+.CartCard .product-quantity-selection, .OrderCard .product-quantity-selection {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1011,7 +1057,7 @@ th::selection {
   padding: 5px 10px;
 }
 
-.CartCard .cart-quantity-input {
+.CartCard .cart-quantity-input, .OrderCard .cart-quantity-input {
   max-width: 50px;
   text-align: center;
   border: none !important;
@@ -1019,7 +1065,7 @@ th::selection {
   padding: 0 !important;
 }
 
-.CartCard .quantity-adjustment-btn {
+.CartCard .quantity-adjustment-btn, .OrderCard .quantity-adjustment-btn {
   background: transparent;
   -webkit-box-shadow: none !important;
           box-shadow: none !important;
@@ -1027,19 +1073,19 @@ th::selection {
   padding: 0 !important;
 }
 
-.CartCard .quantity-adjustment-btn i {
+.CartCard .quantity-adjustment-btn i, .OrderCard .quantity-adjustment-btn i {
   color: #065446;
   font-size: 30px;
 }
 
-.CartCard .add-to-cart-btn {
+.CartCard .add-to-cart-btn, .OrderCard .add-to-cart-btn {
   background: #065446 !important;
   text-transform: inherit;
   margin-left: 20px;
   border-radius: 15px;
 }
 
-.CartCard .cart-management {
+.CartCard .cart-management, .OrderCard .cart-management {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1053,17 +1099,17 @@ th::selection {
           align-items: center;
 }
 
-.CartCard .cart-management div {
+.CartCard .cart-management div, .OrderCard .cart-management div {
   width: -webkit-max-content;
   width: -moz-max-content;
   width: max-content;
 }
 
-.CartCard .card-info {
+.CartCard .card-info, .OrderCard .card-info {
   margin-bottom: 10px;
 }
 
-.CartCard .remove_btn {
+.CartCard .remove_btn, .OrderCard .remove_btn {
   border-radius: 20px !important;
 }
 

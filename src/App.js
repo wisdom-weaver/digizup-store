@@ -12,6 +12,8 @@ import Product from './views/Product';
 import Test from './views/Test';
 import ScrollToTop from './utils/ScrollToTop';
 import Category from './views/Category';
+import Orders from './views/Orders';
+import Order from './views/Order';
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
             <Route exact path="/login"> <Login /> </Route>
             <Route exact path="/signup"> <Signup /> </Route>
             <Route exact path="/product/:productid"> <Product /> </Route>
+            <Route exact path="/account/orders"> <Orders /> </Route>          
+            <Route exact path="/account/order/:orderid"> <Order /> </Route>          
             <Route exact path="/test"> <Test /> </Route>          
             <Route exact path="/"> <Home /> </Route>
           </Switch>

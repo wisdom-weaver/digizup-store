@@ -30,7 +30,15 @@ export const placeOrderAction = (newOrder)=>{
     return (dispatch, getState, {getFirebase, getFirestore})=>{
         const firestore = getFirestore();
         const authuid = getState().firebase.auth.uid;
-        firestore.collection('users').doc(authuid).collection('orders').add({...newOrder, createdAt:new Date()})
+        firestore.collection('users').doc(authuid).collection('orders').add({
+            ...newOrder,
+            status:'Order Placed', 
+            isClosed: false, 
+            createdAt:new Date(), 
+            tracking: [
+                { title:'Placed Order', updateTime: new Date() }
+            ]
+        })
         .then(()=>{console.log('placed order')})
         .then(async ()=>{ 
             var snap = await firestore.collection('users').doc(authuid).collection('cart').get();

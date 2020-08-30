@@ -24,6 +24,19 @@ body{
     font-weight: 400;
 }
 
+.row-flex-center{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.col-flex-center{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 .round-card{
     border-radius: 40px;
     box-shadow: none !important;
@@ -62,6 +75,10 @@ th::selection
     position: relative;
     width: 100%;
     object-fit: contain
+}
+
+.no-wrap{
+    white-space: nowrap;
 }
 
 .light_text{ font-weight: 300; }
@@ -157,6 +174,12 @@ th::selection
     @extend .dark_btn;
 }
 
+.green-chip{
+    background: $trans-green !important;
+    color: $primary-green-dark;
+    @extend .regular_text;
+}
+
 .trans-green-btn{
     background: rgba($primary-green-dark, 0.2);
     color: $primary-green-dark;
@@ -176,6 +199,11 @@ th::selection
     padding: 20px;
     width: 100%;
     max-width: 500px;
+}
+
+.text-link{
+    color: $primary-green-dark;
+    cursor: pointer;
 }
 
 //===============================================================================
@@ -699,7 +727,7 @@ th::selection
 
 //===============================================================================
 //CartCard
-.CartCard{
+.CartCard, .OrderCard{
     .card{
         border-radius: 20px;
         overflow: hidden;
@@ -709,7 +737,7 @@ th::selection
     }
     .card-image{
         max-height: 200px;
-        max-width: 200px;
+        max-width: 200px !important;
         min-height: 200px;
         min-width: 200px;
         img{

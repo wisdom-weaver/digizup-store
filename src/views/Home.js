@@ -1,11 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import Category from './Category';
 
-function Home() {
+function Home(props) {
     return (
-        <div>
-            Home
-        </div>
+        <Category />
     )
 }
-
 export default Home
