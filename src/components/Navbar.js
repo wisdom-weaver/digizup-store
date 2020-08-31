@@ -266,6 +266,7 @@ function Navbar(props) {
                   }
               
               </div>
+              <div onClick={()=>{setMenuOpenState(false)}} className="side_right"></div>
             </div>
           </div>
         </div>

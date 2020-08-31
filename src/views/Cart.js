@@ -19,7 +19,7 @@ function Cart(props) {
     useEffect(()=>{
         if(!authuid || authuid == 'default'){
             setTimeout(()=>{
-                // history.push('/login');
+                history.push('/login');
             },3000)
         }
     },[authuid])

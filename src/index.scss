@@ -352,6 +352,7 @@ input:-webkit-autofill:active {
         height: 100%;
         transition: all 0.2s;
         z-index: -1;
+
         .overlay{
             background-color: rgba($primary-green-dark, 0.2);
             transition: all 0.2s;
@@ -359,10 +360,17 @@ input:-webkit-autofill:active {
             height: 100%;
             width: 100%;
             opacity: 0;
-
+            display: flex;
+            flex-direction: row;
+        }
+        .side_right{
+            background-color: rgba($primary-green-dark, 0.2);
+            min-width: 100px;
+            width: max-content;
+            flex-grow: 1;
         }
         .side_menu_content{
-            width: 50%;
+            min-width: 50%;
             height: 100%;
             max-width: 400px;
             background: white;
@@ -377,6 +385,7 @@ input:-webkit-autofill:active {
             justify-content: space-between;
             align-items: center;
             transform: translateX(-100%);
+            flex-grow: 1;
         }
         .overlayLinkContainer{
             
@@ -452,7 +461,7 @@ input:-webkit-autofill:active {
 .Page{
     min-height: 100vh;
     padding-top: 5.3rem;
-    margin-bottom: 10rem;
+    margin-bottom: 2rem;
     .top-popup{
         position: sticky;
         top: 5.5rem;
@@ -900,7 +909,7 @@ input:-webkit-autofill:active {
     // transform: translateY(-10vh);
 }
 .banner-carousel{
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0)  );
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 70% );
 }
 .flyover-banner{
     transform: translateY(-18vw);

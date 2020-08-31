@@ -32,9 +32,7 @@ function Category(props) {
     },[categoriesCollection])
     useEffect(()=>{
         if(!category || !cat || !categoriesCollection) return;
-        setTimeout(()=>{
-            getProductsCollection();
-        },500)
+        getProductsCollection();
     },[cat])
 
     const getProductsCollection = async ()=>{
