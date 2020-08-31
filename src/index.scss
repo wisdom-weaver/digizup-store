@@ -180,6 +180,13 @@ th::selection
     @extend .regular_text;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 .trans-green-btn{
     background: rgba($primary-green-dark, 0.2);
     color: $primary-green-dark;
@@ -444,7 +451,7 @@ th::selection
 
 .Page{
     min-height: 100vh;
-    padding-top: 5.5rem;
+    padding-top: 5.3rem;
     margin-bottom: 10rem;
     .top-popup{
         position: sticky;
@@ -454,7 +461,7 @@ th::selection
 
 @media only screen and (max-width: 637px) {
     .Page{
-        padding-top: 10rem;
+        padding-top: 9.5rem;
         .top-popup{
             position: sticky;
             top:10.5rem;
@@ -516,12 +523,6 @@ th::selection
             color: $primary-green-light;
             background-color: transparent !important;
             border-radius: 5px;;
-        }
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active {
-            transition: background-color 5000s ease-in-out 0s;
         }
         .helper-text{
             font-size: 10px;
@@ -873,3 +874,55 @@ th::selection
     }
 }
 //===============================================================================
+
+.CatProductCard{
+    .card-title-img{
+        width: 100%;
+        min-height: 150px;
+        max-height: 150px;
+        margin: 0 auto;
+        text-align: center;
+        img{
+            width: 100%;
+            height: auto;
+            max-width: 200px;
+            min-height: 150px;
+            max-height: 150px;
+            object-fit: contain;
+            padding: 10px;
+        }
+    }
+    .card-content-area{
+        min-height: 80px;
+    }
+}
+.categoriesProductsSection{
+    // transform: translateY(-10vh);
+}
+.banner-carousel{
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0)  );
+}
+.flyover-banner{
+    transform: translateY(-18vw);
+}
+@media only screen and (max-width: 420px) {
+    .CatProductCard .card-content-area{
+        min-height: 120px;
+    }
+    .banner-carousel{
+        mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100% );
+        .owl-item{
+            overflow: hidden;;
+        }
+        img{
+            image-resolution: initial;
+            object-position: center;
+            top: 0;
+            transform: scale(1.8) translateY(9vw);
+            overflow: hidden;
+        }
+    }
+    .flyover-banner{
+        transform: translateY(0vw);
+    }
+}

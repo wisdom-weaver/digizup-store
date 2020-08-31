@@ -38,6 +38,7 @@ function ProductCard({product}) {
     return (
         <div className="ProductCard">
             <Card 
+              className="round-card"
               onClick={redirectToProductPage}
               header={<CardTitle image={defaultImage} />}
               horizontal

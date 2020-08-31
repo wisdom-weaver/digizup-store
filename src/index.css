@@ -276,6 +276,14 @@ th::selection {
   color: #065446;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-transition: background-color 5000s ease-in-out 0s;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .trans-green-btn, .Product .product-each-option-element {
   background: rgba(6, 84, 70, 0.2);
   color: #065446;
@@ -623,7 +631,7 @@ th::selection {
 
 .Page, .Login, .Signup, .Cart {
   min-height: 100vh;
-  padding-top: 5.5rem;
+  padding-top: 5.3rem;
   margin-bottom: 10rem;
 }
 
@@ -635,7 +643,7 @@ th::selection {
 
 @media only screen and (max-width: 637px) {
   .Page, .Login, .Signup, .Cart {
-    padding-top: 10rem;
+    padding-top: 9.5rem;
   }
   .Page .top-popup, .Login .top-popup, .Signup .top-popup, .Cart .top-popup {
     position: -webkit-sticky;
@@ -709,17 +717,6 @@ th::selection {
   color: #20927F;
   background-color: transparent !important;
   border-radius: 5px;
-}
-
-.Login .input-field input:-webkit-autofill,
-.Login .input-field input:-webkit-autofill:hover,
-.Login .input-field input:-webkit-autofill:focus,
-.Login .input-field input:-webkit-autofill:active, .Signup .input-field input:-webkit-autofill,
-.Signup .input-field input:-webkit-autofill:hover,
-.Signup .input-field input:-webkit-autofill:focus,
-.Signup .input-field input:-webkit-autofill:active {
-  -webkit-transition: background-color 5000s ease-in-out 0s;
-  transition: background-color 5000s ease-in-out 0s;
 }
 
 .Login .input-field .helper-text, .Signup .input-field .helper-text {
@@ -1216,5 +1213,68 @@ th::selection {
   -webkit-box-flex: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
+}
+
+.CatProductCard .card-title-img {
+  width: 100%;
+  min-height: 150px;
+  max-height: 150px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.CatProductCard .card-title-img img {
+  width: 100%;
+  height: auto;
+  max-width: 200px;
+  min-height: 150px;
+  max-height: 150px;
+  -o-object-fit: contain;
+     object-fit: contain;
+  padding: 10px;
+}
+
+.CatProductCard .card-content-area {
+  min-height: 80px;
+}
+
+.banner-carousel {
+  -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, from(black), to(rgba(0, 0, 0, 0)));
+  -webkit-mask-image: linear-gradient(to bottom, black, rgba(0, 0, 0, 0));
+          mask-image: -webkit-gradient(linear, left top, left bottom, from(black), to(rgba(0, 0, 0, 0)));
+          mask-image: linear-gradient(to bottom, black, rgba(0, 0, 0, 0));
+}
+
+.flyover-banner {
+  -webkit-transform: translateY(-18vw);
+          transform: translateY(-18vw);
+}
+
+@media only screen and (max-width: 420px) {
+  .CatProductCard .card-content-area {
+    min-height: 120px;
+  }
+  .banner-carousel {
+    -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, color-stop(60%, black), to(rgba(0, 0, 0, 0)));
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, rgba(0, 0, 0, 0) 100%);
+            mask-image: -webkit-gradient(linear, left top, left bottom, color-stop(60%, black), to(rgba(0, 0, 0, 0)));
+            mask-image: linear-gradient(to bottom, black 60%, rgba(0, 0, 0, 0) 100%);
+  }
+  .banner-carousel .owl-item {
+    overflow: hidden;
+  }
+  .banner-carousel img {
+    image-resolution: initial;
+    -o-object-position: center;
+       object-position: center;
+    top: 0;
+    -webkit-transform: scale(1.8) translateY(9vw);
+            transform: scale(1.8) translateY(9vw);
+    overflow: hidden;
+  }
+  .flyover-banner {
+    -webkit-transform: translateY(0vw);
+            transform: translateY(0vw);
+  }
 }
 /*# sourceMappingURL=index.css.map */

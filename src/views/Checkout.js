@@ -60,7 +60,7 @@ function Checkout(props) {
 
     const cards = useSelector(state=> state.firestore.ordered.cards) ?? [];
     useEffect(()=>{ 
-        console.log('cards',cards);
+        // console.log('cards',cards);
         if(!cards || cards.length==0) return;
         if(cardIndex == -1) setCardIndex(0);
     },[cards]);
@@ -77,17 +77,17 @@ function Checkout(props) {
     var initCard = { cardHolderName: '', cardNo: '', cardExpMM: '', cardExpYY: '' };
     const [newCard, setNewCard] = useState(initCard);
     useEffect(()=>{
-        console.log({addressIndex});
+        // console.log({addressIndex});
     },[addressIndex]);
     useEffect(()=>{
-        console.log({cardIndex});
+        // console.log({cardIndex});
     },[cardIndex]);
     const submitNewAddress = ()=>{
         addAddress(newAddress);
         setNewAddress(initAddress);
     }
     const submitAddress = ()=>{
-        console.log({addresses,addressIndex});
+        // console.log({addresses,addressIndex});
         if(addressIndex < 0) return;
         else{setStage(1);}
     }
@@ -98,7 +98,7 @@ function Checkout(props) {
     } 
 
     const submitPaymentMode = ()=>{
-        console.log('paymentModeIndex', paymentModeIndex, 'cardIndex', cardIndex);
+        // console.log('paymentModeIndex', paymentModeIndex, 'cardIndex', cardIndex);
         if(paymentModeIndex == 0 && cardIndex > -1) setStage(2);
         if(paymentModeIndex > 0) setStage(2);
     }
@@ -277,7 +277,7 @@ function Checkout(props) {
                        ]}
                        bottomSheet={false}
                        fixedFooter={true}
-                       header="Add a new Address"
+                       header="Add a new Card"
                        id="addAddressModal"
                        open={false}
                        options={{
