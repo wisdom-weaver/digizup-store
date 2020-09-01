@@ -111,9 +111,24 @@ function Checkout(props) {
         if(paymentModeIndex< 0 )return;
         if(paymentModeIndex == 0 && cardIndex < 0)return;
         var order = { 
-            cart: cart,
+            cart: cart.map(each=>({
+                    cartQty: each.cartQty,
+                    productName: each.productName,
+                    price: each.price,
+                    productid: each.productid,
+                    option: each.option,
+                    defaultImage: each.defaultImage,
+                })),
             total: total,
-            address:addresses[addressIndex],
+            address:{
+                    fullName: addresses[addressIndex].fullName,
+                    addressLine: addresses[addressIndex].addressLine,
+                    city: addresses[addressIndex].city,
+                    state: addresses[addressIndex].state,
+                    country: addresses[addressIndex].country,
+                    pincode: addresses[addressIndex].pincode,
+                    phoneNo: addresses[addressIndex].phoneNo,
+                },
             paymentType: paymentModes[paymentModeIndex].paymentType,
             consumeruid: authuid,
             cartCount: cart.reduce((tot,each)=>(tot+each.cartQty),0)??0,
@@ -125,6 +140,7 @@ function Checkout(props) {
         }else{
             order = {...order}
         }
+        console.log(order);
         placeOrder(order);
     }
 
@@ -150,7 +166,7 @@ function Checkout(props) {
                              </p>
                             <p>{eachLoc.addressLine}</p>
                             <p>{eachLoc.city}, {eachLoc.state}-{eachLoc.pincode}</p>
-                            <p>{eachLoc.country}</p>
+                            <p>{eachLoc.phoneNo}--{eachLoc.country}</p>
                         </div>
                     </div>   
                 </div>

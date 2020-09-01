@@ -33,7 +33,7 @@ export const placeOrderAction = (newOrder)=>{
         firestore.collection('users').doc(authuid).collection('orders').add({
             ...newOrder,
             status:'Order Placed', 
-            isClosed: false, 
+            isOpen: true, 
             createdAt:new Date(), 
             tracking: [
                 { title:'Placed Order', updateTime: new Date() }
