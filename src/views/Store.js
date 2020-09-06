@@ -30,7 +30,7 @@ function Store(props) {
       }
     },[searchTerm,category])
     useEffect(()=>{
-      console.log("searchState=>",{searchMessage, searchError, searchResults});
+      // console.log("searchState=>",{searchMessage, searchError, searchResults});
     },[searchMessage,searchError, searchResults])
     return (
         <div className="Store Page">

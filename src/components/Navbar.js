@@ -50,7 +50,7 @@ function Navbar(props) {
     }]);
     const cart =  useSelector(state=> state.firestore.ordered.cart) ?? []
     useEffect(()=>{
-      var localCartCount = cart.reduce((tot,each)=>(tot+each.cartQty),0);
+      var localCartCount = cart.reduce((tot,each)=>(parseInt(parseInt(tot)+parseInt(each.cartQty))),0);
       setCartCount(localCartCount);
     },[cart])
 

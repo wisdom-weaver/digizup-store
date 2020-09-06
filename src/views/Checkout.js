@@ -10,11 +10,18 @@ import { isLoaded, useFirestoreConnect, useFirebaseConnect, useFirestore } from 
 import { db } from '../config/FirebaseConfig';
 import { addAddressAction, addCardAction, placeOrderAction } from '../store/actions/checkoutActions';
 import Delayed from '../utils/Delayed';
+import { priceFormat } from '../utils/utils';
 
 function Checkout(props) {
     
     const authuid = useSelector(state=> state.firebase.auth.uid ) ?? 'default';
     const history = useHistory();
+
+    const [stage, setStage] = useState(0);
+    useEffect(()=>{
+        window.scrollTo(0,0);
+    },[stage])
+
     useEffect(()=>{
         if(!authuid || authuid == 'default'){
             setTimeout(()=>{
@@ -114,7 +121,7 @@ function Checkout(props) {
             cart: cart.map(each=>({
                     cartQty: each.cartQty,
                     productName: each.productName,
-                    price: each.price,
+                    productPrice: each.productPrice,
                     productid: each.productid,
                     option: each.option,
                     defaultImage: each.defaultImage,
@@ -262,7 +269,7 @@ function Checkout(props) {
                         <Fragment>
                             <p className="flow-text center">Saved Cards: </p>
                             {cards.map((card,index)=>(
-                             <div className="col s12 m6">
+                             <div className="col s12 m6" key={uuid()}>
                                  <div className="card round-card"
                                  onClick={()=>{setCardIndex(index)}} 
                                  >
@@ -294,7 +301,7 @@ function Checkout(props) {
                        bottomSheet={false}
                        fixedFooter={true}
                        header="Add a new Card"
-                       id="addAddressModal"
+                       id="addCardModal"
                        open={false}
                        options={{
                          dismissible: true,
@@ -355,7 +362,7 @@ function Checkout(props) {
             <h4 className="center">Select Your Payment Option</h4>
             <Collapsible>
                 {paymentModes.map((mode,index)=>(
-                <CollapsibleItem
+                <CollapsibleItem key={uuid()}
                     expanded = {(index == paymentModeIndex)}
                     onClick={()=>{setPaymentModeIndex(index)}}
                     header={( 
@@ -388,10 +395,10 @@ function Checkout(props) {
         <div className="checkout-order-summary-section">
         {/* 3=> order summary   */}
             <div className="summary-delivery-address">
-                <h6>Delivery Address:</h6>
                 {(addresses && addressIndex>-1)?(<div className="center">
+                    <h6 className="center"> <Icon>location_on</Icon> Delivery Address:</h6>
                     <div className="row">
-                        <div className="card col s8 m8 l6 round-card">
+                        <div className="card col s8 m8 l6 offset-m2 offset-l3 round-card">
                             <div className="card-content">
                             {(addresses[addressIndex])?(
                             <Fragment>
@@ -407,11 +414,11 @@ function Checkout(props) {
                 </div>):(null)}
             </div>
             <div className="summary-payment-mode">
-                <h6>Payment Option: <Icon>{paymentModes[paymentModeIndex].paymentModeIcon}</Icon> {paymentModes[paymentModeIndex].paymentModeHead}</h6>
+                <h6 className="center">Payment Option: <Icon>{paymentModes[paymentModeIndex].paymentModeIcon}</Icon> {paymentModes[paymentModeIndex].paymentModeHead}</h6>
                 {(paymentModeIndex==0 && cards && cardIndex> -1)?(
-                <div className="center">
+                    <div className="center">
                     <div className="row">
-                        <div className="card col s8 m8 l6 round-card">
+                        <div className="card col s8 m8 l6 offset-m2 offset-l3 round-card">
                             <div className="card-content left-align">
                                 <p className="heavy_text">Card Holder: {cards[cardIndex].cardHolderName}</p>
                                 <p className="heavy_text">Card Number: {'XXXX XXXX XXXX '+cards[cardIndex].cardNo.slice(12)}</p>
@@ -422,23 +429,38 @@ function Checkout(props) {
                 </div>):(null)}
             </div>
             <div className="summary-order-details">
+                <div className="row">
+                <div className="col s12 m8 l8 offset-m2 offset-l2">
+                <div className="card round-card">
+                <div className="card-content">
                 <table>
                     <tbody>
                         <tr>
-                            <td>Product</td> <td>Price/Qty</td> <td>Qty</td> <td>SubTotal</td>
+                            <td>Product</td><td>Price/Qty</td><td>Qty</td><td>SubTotal</td>
                         </tr>
                         { cart && cart.map(item=>( 
+                        <tr key={uuid()} >
+                            <td>{item.productName}</td><td>{item.productPrice}</td><td>{item.cartQty}</td><td>{item.productPrice*item.cartQty}</td>
+                        </tr>))}
                         <tr>
-                            <td>{item.productName}</td> <td>{item.productPrice}</td> <td>{item.cartQty}</td> <td>{item.productPrice*item.cartQty}</td>
-                        </tr> ))}
-                        <tr>
-                            <td></td> <td></td> <td className="heavy_text">Total</td> <td className="heavy_text">{total}</td>
+                            <td></td><td></td><td className="heavy_text">Total</td><td className="heavy_text no-wrap">{ priceFormat(total)}</td>
                         </tr>
                     </tbody>
                 </table>
+                </div>
+                </div>
+                </div>
+                </div>
             </div>
             <div className="summary-payment-proceeding">
-                <div onClick={()=>{proceedToPayment()}} className="btn dark_btn">Proceed To Payment</div>
+                <div className="row">
+                    <div className="col s12 m6 center">
+                        <div onClick={()=>{setStage(0)}} className="btn light_btn">Edit Address/Payment Options</div>
+                    </div>
+                    <div className="col s12 m6 center">
+                        <div onClick={()=>{proceedToPayment()}} className="btn dark_btn">Proceed To Payment</div>
+                    </div>
+                </div>
             </div>
         </div>
     )
@@ -454,7 +476,7 @@ function Checkout(props) {
             <h5 className="center">Success!!</h5>
         </div>
     )
-    const [stage, setStage] = useState(0);
+    
     const checkout = [
         deliverySectionJSX,
         paymentModesSectionJSX,
@@ -476,7 +498,7 @@ function Checkout(props) {
                         <div className="card round-card">
                         <div className="card-content">
                             <p className="flow-text">
-                                Please <span className="heavy_text primary-green-dark-text">SignIn</span> To Continue
+                                Please <span className="heavy_text primary-green-dark-text">SignIn</span>To Continue
                             </p>
                         </div>    
                         </div>    

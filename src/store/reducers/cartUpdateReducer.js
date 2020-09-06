@@ -4,7 +4,7 @@ const initState ={
 }
 
 export const cartUpdateReducer = (state = initState, action)=>{
-    console.log(action.type);
+    // console.log(action.type);
     switch(action.type){
         case 'CART_UPDATING': return {...state, cartMessage:action.type};
         case 'CART_UPDATED': return {...state, cartMessage:action.type};

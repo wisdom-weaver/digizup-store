@@ -9,6 +9,8 @@ $primary-creme-dark: #F0E6C1;
 $trans-green: #CDDDDA;
 $trans-creme: #FDFCF6;
 $trans-blue: #E1E5E9;
+$primary-red: #960019;
+
 * {
     padding: 0;
     margin: 0;
@@ -29,6 +31,13 @@ body{
     flex-direction: row;
     justify-content: center;
     align-items: center;
+}
+.flex-wrap{
+    flex-wrap: wrap;
+}
+.flex-grow{
+    flex-grow: 1;
+    width: 100% !important;
 }
 .col-flex-center{
     display: flex;
@@ -80,6 +89,9 @@ th::selection
 .no-wrap{
     white-space: nowrap;
 }
+.hoverable{
+    cursor: pointer !important;
+}
 
 .light_text{ font-weight: 300; }
 .regular_text{ font-weight: 500; }
@@ -87,6 +99,8 @@ th::selection
 
 .bg-color-text {color: $bg-color; }
 .primary-green-dark-text {color: $primary-green-dark; }
+.primary-red-text {color: $primary-red; }
+.head {color: $primary-green-dark !important; }
 .primary-green-light-text {color: $primary-green-light; }
 .primary-blue-text {color: $primary-blue; }
 .primary-creme-light-text {color: $primary-creme-light; }
@@ -94,6 +108,10 @@ th::selection
 .trans-green-text {color: $trans-green; }
 .trans-creme-text {color: $trans-creme; }
 .trans-blue-text {color: $trans-blue; }
+
+.trans-green-bg {background-color: $trans-green !important; }
+.primary-green-dark-bg {background: $primary-green-dark !important; }
+.primary-red-bg {background: $primary-red !important; }
 
 .light_btn{
     background-color: $trans-green !important;
@@ -152,7 +170,7 @@ th::selection
 }
 
 .red_btn{
-    background-color: rgb(248, 75, 75) !important;
+    background-color: $primary-red !important;
     border-radius: 10px !important;
     box-shadow: none;
     text-transform: inherit;
@@ -180,11 +198,17 @@ th::selection
     @extend .regular_text;
 }
 
+.green-dark-chip{
+    background: rgba($primary-green-dark,0.6) !important;
+    color: $primary-green-dark;
+    @extend .regular_text;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-    transition: background-color 5000s ease-in-out 0s;
+    transition: background-color 5000s ease-in-out 0s !important;
 }
 
 .trans-green-btn{
@@ -216,6 +240,7 @@ input:-webkit-autofill:active {
 //===============================================================================
 // navbar
 .Navbar{
+    position: relative;
     nav{
         width: 100%;
         background: white;
@@ -307,6 +332,7 @@ input:-webkit-autofill:active {
 
     .navbar__searchInput_container{
         flex-grow: 1;
+        padding-top: 5px;
     }
     .navbar__searchInput{
         margin: 10px 0px;
@@ -460,7 +486,7 @@ input:-webkit-autofill:active {
 
 .Page{
     min-height: 100vh;
-    padding-top: 5.3rem;
+    padding-top: 5.35rem;
     margin-bottom: 2rem;
     .top-popup{
         position: sticky;
@@ -468,9 +494,9 @@ input:-webkit-autofill:active {
     }
 }
 
-@media only screen and (max-width: 637px) {
+@media only screen and (max-width: 700px) {
     .Page{
-        padding-top: 9.5rem;
+        padding-top: 9.1rem;
         .top-popup{
             position: sticky;
             top:10.5rem;
@@ -484,7 +510,7 @@ input:-webkit-autofill:active {
     }
     .Navbar nav .navbar__searchInput_container{
         position: fixed;
-        top: 65px;
+        top: 55px;
         left: 0;
         width: 100%;
         background: white;
@@ -504,9 +530,13 @@ input:-webkit-autofill:active {
     display: flex;
     justify-content: center;
     align-items: center;
+    .form-container{
+        margin: 0 auto;
+    }
     .card{
         border-radius: 45px;
         padding: 5px 20px;
+        margin: 0 auto;
     }
     .card-title{
         width: 100%;
@@ -573,6 +603,8 @@ input:-webkit-autofill:active {
         position: relative;
         width: 100%;
         min-height: 20px;
+        display: flex;
+        justify-content: center;
     }
     .log .success{
         background-color: $trans-green;
@@ -706,6 +738,10 @@ input:-webkit-autofill:active {
     }
     .quantity-selection-container{
         background: rgba($primary-green-light,0.2);
+        display: flex;
+        justify-content: space-around;
+        width: max-content;
+        margin: 5px auto;
         border-radius: 30px;
         padding:0px 10px; 
     }
@@ -933,5 +969,185 @@ input:-webkit-autofill:active {
     }
     .flyover-banner{
         transform: translateY(0vw);
+    }
+}
+
+.searchbar_container{
+    flex-grow: 1;
+    margin: 0 auto;
+    max-width: 500px;
+    .searchInput{
+        margin: 10px 0px;
+        height: min-content;
+        background-color: $trans-green;
+        display: flex;
+        border-radius: 40px;
+        padding: 5px 15px;
+        display: flex;
+        flex-direction: row ;
+        justify-content: center;
+        align-items: center;
+        margin: 0px 10px;
+        height: 45px;
+        transition: all 0.2s;
+        box-shadow: inset 0px 0px 5px 2px white;
+        flex-grow: 1;
+        input{
+            border: none;
+            color: $primary-green-dark;
+            padding-left: 10px;
+            margin: 0;
+        }
+        input:focus{
+            box-shadow: none !important;
+            border: none !important;
+        }
+        &:focus-within{
+            box-shadow: inset 0px 0px 5px 2px $primary-green-light;
+        }
+    }
+}
+.small-font{
+    font-size: 10px !important;;
+}
+.small-table{
+    font-size: 10px !important;;
+    span, .btn, p, label{
+        font-size: 10px !important;;
+    }
+    .material-icons{
+        font-size: 20px !important;
+    }
+    overflow: auto;
+}
+
+.headPlaceholder::placeholder { /* WebKit browsers */
+    color: $primary-green-dark !important;
+    opacity: 1 !important;
+}
+.regularPlaceholder::placeholder { /* WebKit browsers */
+    color: black !important;
+    opacity: 1 !important;
+}
+
+
+.log{
+    position: relative;
+    width: 100%;
+    min-height: 20px;
+    display: flex;
+    justify-content: center;
+}
+.log .success{
+    background-color: $trans-green;
+    color: $primary-green-dark;
+    width: max-content;
+    border-radius: 20px;
+    padding: 5px 10px;
+    animation: animateLog 5s forwards;
+    white-space: pre-wrap;
+}
+.log .error{
+    background-color: rgba($color: red, $alpha: 0.3);
+    width: max-content;
+    color: red;
+    border-radius: 20px;
+    padding: 5px 10px;
+    animation: animateLog 5s forwards;
+    white-space: pre-wrap;
+    font-size: 10px;
+}
+
+.category_chip{
+    padding: 5px 10px !important;
+    border-radius: 15px !important;
+    margin: 5px;
+    cursor: pointer;
+    &.available  { 
+        background-color: rgba($primary-green-dark,0.2) !important;
+        color: $primary-green-dark;
+     }
+    &.unavailable{ 
+        background-color: rgba($primary-red,0.2) !important;
+        color: $primary-red;
+     }
+    &.selected   { 
+        background-color: rgba($primary-green-dark,0.9) !important;
+        color: white;
+     }
+}
+
+.Product{
+    .top-row{
+        max-width: 100%;
+        display: flex;
+        .image-section{
+            max-width: 400px;
+            max-height: 450px;
+            min-width: 400px;
+            position: sticky;
+            top: 5.4rem;
+            img{
+                min-width: 350px;
+                min-height: 350px;
+                max-width: 370px;
+                max-height: 370px;
+                object-fit: contain;
+            }
+        }
+        .product-section{
+            flex-grow: 1;
+            padding: 5px 10px;
+        }
+    }
+}
+@media only screen and (min-width: 500px) and (max-width:700px) {
+    .Product{
+        .top-row{
+            max-width: 100%;
+            display: flex;
+            .image-section{
+                max-width: 300px;
+                max-height: 350px;
+                min-width: 300px;
+                position: sticky;
+                top: 5.4rem;
+                img{
+                    min-width: 250px;
+                    min-height: 250px;
+                    max-width: 280px;
+                    max-height: 280px;
+                    object-fit: contain;
+                }
+            }
+            .product-section{
+                flex-grow: 1;
+                padding: 5px 10px;
+            }
+        }
+    }
+}
+@media only screen and (max-width: 500px) {
+    .Product{
+        .top-row{
+            display: block;
+            .image-section{
+                min-width: 100px !important;
+                max-width: 98% !important;
+                max-height: 460px;
+                width: 98% !important;
+                margin: 0 auto !important;
+                position: relative;
+                top: 0;
+                img{
+                    min-width: 100px;
+                    max-height: 400px;
+                    max-width: 98% !important;
+                }
+            }
+            .product-section{
+                width: 100%;
+            }
+        }
     }
 }

@@ -19,7 +19,7 @@ function CatProductCard(props) {
             >
               <div className="card-content-area">
                 <NavLink to={ '/product/'+productid+(productOption?('?productOption='+productOption):('')) } >
-                    <p class="text-link">{productName}</p>
+                    <p className="text-link">{productName}</p>
                 </NavLink>
                 <p className="right-align heavy_text">{ priceFormat(price) }</p>
               </div>

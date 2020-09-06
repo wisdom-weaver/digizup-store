@@ -45,12 +45,12 @@ function Category(props) {
             var data = doc.data();
             var pro = {};
             if(data.hasOptions == true){
-                var options = Object.keys(data).filter(each=>each.startsWith('option_'));
+                var options = Object.keys(data.productOptions).sort().filter(each=>data.productOptions[each].isActive);
                 var randOption = options[ Math.floor(Math.random()*options.length) ];
                 pro={
-                    productName: data[randOption].productFullName,
-                    defaultImage: data[randOption].images[0],
-                    price: data[randOption].price,
+                    productName: data.productOptions[randOption].productFullName,
+                    defaultImage: data.productOptions[randOption].images[0],
+                    price: data.productOptions[randOption].price,
                     productid: doc.id,
                     productOption: randOption,
                     hasOptions: true
