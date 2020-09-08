@@ -41,6 +41,7 @@ export const searchAction = (searchTerm, category)=>{
                     // console.log('key',key);
                     if(!data.productOptions[key].isActive) return;
                     var matches = data.productOptions[key].optionTags.reduce((acc,tag)=> (keywords.includes(tag))?(acc+1):(acc) ,0);
+                    console.log(key, matches, data.productOptions[key].optionTags);
                     out.push({ id: doc.id,
                         productName:data.productOptions[key].productFullName,
                         price:data.productOptions[key].price,
@@ -54,6 +55,7 @@ export const searchAction = (searchTerm, category)=>{
             });
         })
         out = _.orderBy( out, ['matches','option'], ['desc','asc']);
+        console.log(out);
         // console.log('Results=>',out);
         if(out.length > 0) dispatch({ type:"SEARCH_RESULTS_FETCHED", searchResults: out });
         else dispatch({ type:"SEARCH_RESULTS_NOT_FOUND", err: "No Results Found" });

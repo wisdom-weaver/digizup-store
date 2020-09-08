@@ -121,9 +121,14 @@ function Order(props) {
                     {order.tracking.map(each => (<tr><td className="line-break">{each.title}</td><td className="no-wrap">{moment(each.updateTime.toDate()).format('MMM Do YY, h:mm a')}</td></tr>))}
                 </tbody>
             </table>) : (null)}
-            {(order.status =="Cancellation Pending" || order.status =="Delivered" || order.status == "Out for Delivery" || order.status == "Cancelled" )
-            ?( <div className="btn red_btn disabled">Request Cancellation</div> )
-            :(<Fragment>{cancelButton}</Fragment>)}
+            {['Out for Delivery', 'Delivered', 'Cancelled'].includes(order.status)?(null):(
+                <Fragment>
+                    {(['Cancellation Requested'].includes(order.status))
+                    ?( <div className="btn red_btn disabled">Request Cancellation</div> )
+                    :(<Fragment>{cancelButton}</Fragment>)}
+                </Fragment>
+            )}
+            
         </div>
     </div>):(null);
 

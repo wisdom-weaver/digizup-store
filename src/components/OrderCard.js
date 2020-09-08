@@ -32,15 +32,22 @@ function OrderCard(props) {
                 >
                   <span className="flow-text">{cartCount}</span> {(cartCount>1)?'items':'item'}
                 </Chip>
-                <p>Order Placed: <span className="heavy_text">{
-                    moment(createdAt.toDate()).format('MMM Do YY, h:mm a')
-                }</span></p>
-                <p>Total: <span className="heavy_text">{priceFormat(total)}</span></p>
-            <p>Status: <span className="heavy_text">{status}</span></p>
                 <div className="row">
-                    <div onClick={redirectToOrderSummaryPage} className="col s12 m6 center"> <div className="btn light_btn">View Order</div> </div>
-                    <div className="col s12 "></div>
-                    <div onClick={redirectToOrderSummaryPage} className="col s12 m6 center"> <div className="btn dark_btn">Track Order</div> </div>
+                  <div className="col s12 l7">
+                    <table>
+                      <tbody>
+                        <tr><td>Order Placed: </td><th>{moment(createdAt.toDate()).format('MMM Do YY, h:mm a')}</th></tr>
+                        <tr><td>Total: </td><th>{priceFormat(total)}</th></tr>
+                        <tr><td>Status: </td><th>{status}</th></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="col s12 l5">
+                    <div className="row">
+                        <div onClick={redirectToOrderSummaryPage} className="col s12 l12 center"> <div className="btn light_btn">View Order</div> </div>
+                        <div onClick={redirectToOrderSummaryPage} className="col s12 l12 center"> <div className="btn dark_btn">Track Order</div> </div>
+                    </div>
+                  </div>
                 </div>
             </Card> 
         </div>

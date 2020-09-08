@@ -149,6 +149,7 @@ function Checkout(props) {
         }
         console.log(order);
         placeOrder(order);
+        history.push('account/orders');
     }
 
     const deliverySectionJSX = (

@@ -65,7 +65,7 @@ function Cart(props) {
 
 
     const cartTotalSectionJSX = (
-            <div className="col s12 m5 push-s0 push-m7">
+            <div className="col s12 l5 push-s0 push-l7">
                 <div className="cart-total-container center">
                   <h6 className="primary-green-light">Cart Total</h6>
                   <h5 className="center-align primary-green-dark heavy_text">{priceFormat(total)}</h5>
@@ -73,7 +73,7 @@ function Cart(props) {
                 </div>
             </div>);
     const cartItemsJSX = (
-            <div className="col s12 m7 pull-s0 pull-m5">
+            <div className="col s12 l7 pull-s0 pull-l5">
                 <div className="cart-items-container">
                   {cart && cart.map(cartItem=>( <CartCard key={uuid()} cartFunc={cartFunc} cartItem={cartItem} /> ))}
                 </div>
@@ -132,7 +132,7 @@ function Cart(props) {
     )
 }
 const mapStateToProps = (state)=>{
-    console.log(state);
+    // console.log(state);
     return{
         cartUpdate: state.cartUpdate,
         authuid : state.firebase.auth.uid

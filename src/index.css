@@ -1595,7 +1595,7 @@ input:-webkit-autofill:active {
     min-width: 300px;
     position: -webkit-sticky;
     position: sticky;
-    top: 5.4rem;
+    top: 9.4rem;
   }
   .Product .top-row .image-section img {
     min-width: 250px;

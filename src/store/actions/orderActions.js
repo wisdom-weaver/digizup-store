@@ -9,12 +9,12 @@ export const requestCancellationAction = (orderId, cancellationMessage)=>{
         .then(snap=>{
             console.log('got snap',snap);
             var {tracking} = snap.data();
-            tracking.unshift({ title: 'Requested Cancellation', updateTime: new Date() });
+            tracking.unshift({ title: 'Cancellation Requested', updateTime: new Date() });
             console.log('tracking',tracking);
             console.log(orderId, cancellationMessage);
             return firestore.collection('users').doc(authuid).collection('orders').doc(orderId).update({
                 tracking,
-                status: "Cancellation Pending",
+                status: "Cancellation Requested",
                 cancellationMessage
             })
         })

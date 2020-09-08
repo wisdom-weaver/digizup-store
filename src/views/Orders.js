@@ -5,6 +5,8 @@ import { useSelector } from 'react-redux'
 import { useFirestoreConnect } from 'react-redux-firebase';
 import Delayed from '../utils/Delayed';
 import OrderCard from '../components/OrderCard';
+import _ from 'lodash';
+
 
 function Orders() {
     
@@ -18,7 +20,9 @@ function Orders() {
     const ordersCollection =  useSelector(state=>state.firestore.ordered.orders) ?? [];
     const [orders, setOrders] = useState([]);
     useEffect(()=>{
-        setOrders(ordersCollection);
+        var local = ordersCollection;
+        local = _.orderBy(local,['createdAt'],['desc'])
+        setOrders(local);
     },[ordersCollection])
     
     const ordersJSX = (

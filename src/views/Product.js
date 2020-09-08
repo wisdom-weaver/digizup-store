@@ -215,6 +215,15 @@ function Product(props) {
         </Fragment>
     ):(null))
 
+    const DescriptionJSX= (renderedProduct && renderedProduct.description?(
+        <Fragment>
+            <h5 className="left-align head regular_text">Description</h5>
+            <div className="container">
+                <p className="line-break">{renderedProduct.description}</p>
+            </div>
+        </Fragment>
+    ):(null))
+
     return (
         <div className="Product Page">
             {(renderedProduct && renderedProduct.productName)
@@ -230,6 +239,7 @@ function Product(props) {
                         {FeaturesJSX}
                     </div>
                 </div>
+                {DescriptionJSX}
                 {SpecsJSX}
             </div>
             )
