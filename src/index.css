@@ -1326,10 +1326,12 @@ input:-webkit-autofill:active {
 }
 
 .banner-carousel {
-  -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, color-stop(10%, black), color-stop(70%, rgba(0, 0, 0, 0)));
-  -webkit-mask-image: linear-gradient(to bottom, black 10%, rgba(0, 0, 0, 0) 70%);
-          mask-image: -webkit-gradient(linear, left top, left bottom, color-stop(10%, black), color-stop(70%, rgba(0, 0, 0, 0)));
-          mask-image: linear-gradient(to bottom, black 10%, rgba(0, 0, 0, 0) 70%);
+  -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, color-stop(70%, black), color-stop(90%, rgba(0, 0, 0, 0)));
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, rgba(0, 0, 0, 0) 90%);
+          mask-image: -webkit-gradient(linear, left top, left bottom, color-stop(70%, black), color-stop(90%, rgba(0, 0, 0, 0)));
+          mask-image: linear-gradient(to bottom, black 70%, rgba(0, 0, 0, 0) 90%);
+  min-height: 400px !important;
+  max-height: 800px !important;
 }
 
 .flyover-banner {
@@ -1346,6 +1348,8 @@ input:-webkit-autofill:active {
     -webkit-mask-image: linear-gradient(to bottom, black 60%, rgba(0, 0, 0, 0) 100%);
             mask-image: -webkit-gradient(linear, left top, left bottom, color-stop(60%, black), to(rgba(0, 0, 0, 0)));
             mask-image: linear-gradient(to bottom, black 60%, rgba(0, 0, 0, 0) 100%);
+    min-height: 200px !important;
+    max-height: 200px !important;
   }
   .banner-carousel .owl-item {
     overflow: hidden;
@@ -1355,8 +1359,6 @@ input:-webkit-autofill:active {
     -o-object-position: center;
        object-position: center;
     top: 0;
-    -webkit-transform: scale(1.8) translateY(9vw);
-            transform: scale(1.8) translateY(9vw);
     overflow: hidden;
   }
   .flyover-banner {

@@ -21,7 +21,7 @@ function Category(props) {
     const productsCollection = [];
     var [categoryProducts,setCategoryProducts] = useState(null??[]);
     useEffect(()=>{
-        console.log('category=>', category);
+        // console.log('category=>', category);
         if(!categoriesCollection) return;
         setCat( categoriesCollection.find(each=>(category==each.title || category==each.urlid)) );
         setCategoryProducts([]);
@@ -37,7 +37,7 @@ function Category(props) {
 
     const getProductsCollection = async ()=>{
         var keywords = [category,cat?.title];
-        console.log({keywords});
+        // console.log({keywords});
         const snaps = await db.collection('products').where('categories','array-contains-any',keywords).get();
         if(snaps.empty){console.log('empty');return; }
         var localProducts = [];
@@ -67,7 +67,7 @@ function Category(props) {
             }
             localProducts.push(pro);
         })
-        console.log('localProducts',localProducts);
+        // console.log('localProducts',localProducts);
         setCategoryProducts(localProducts);
     }
     

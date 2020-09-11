@@ -6,7 +6,7 @@ import { withRouter, NavLink } from 'react-router-dom';
 import { priceFormat } from '../utils/utils';
 
 function CatProductCard(props) {
-    console.log(props);
+    // console.log(props);
     const { productName, defaultImage, price, productid, productOption } = props.product;
     // console.log(defaultImage);
     return (
