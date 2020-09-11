@@ -43,6 +43,14 @@ export const removeFromCartAction = (cartid)=>{
     }
 }
 
+export const deleteNotification =  (docid)=>{
+    return (dispatch,getState,{getFirebase,getFirestore})=>{
+        const firestore = getFirestore();
+        const authuid = getState().firebase.auth.uid;
+        firestore.collection('/users').doc(authuid).collection('cartNotifications').doc(docid).delete();
+    }
+}
+
 export const cartMessageReset = ()=>{
     return (dispatch,getState,{getFirebase,getFirestore})=>{
         return dispatch({type:'CART_MESSAGE_RESET'});

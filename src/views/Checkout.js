@@ -45,6 +45,7 @@ function Checkout(props) {
         subcollections: [{collection:'cards'}],
         storeAs: 'cards'
     }]);
+
     const addAddress = props?.addAddress;
     const addCard = props?.addCard;
     const placeOrder = props?.placeOrder;
@@ -71,7 +72,7 @@ function Checkout(props) {
         if(!cards || cards.length==0) return;
         if(cardIndex == -1) setCardIndex(0);
     },[cards]);
-    
+
     const [total,setTotal] = useState(0);
 
     useEffect(()=>{},[cart, addresses, cards])

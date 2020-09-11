@@ -87,3 +87,87 @@ exports.orderUpdatedAdminsSide = functions.firestore
         return updateOrderUserSide(update);
         // return console.log('order req',order);
     })
+
+exports.productPriceUpdated = functions.firestore
+    .document('products/{productid}')
+    .onUpdate((change,context)=>{
+        const beforedoc = change.before.data();
+        const afterdoc = change.after.data();
+        if(afterdoc.hasOptions == true){
+            var productOptions = Object.keys(afterdoc.productOptions).sort().filter(each=>afterdoc.productOptions[each].isActive);
+            productOptions.forEach(each=>{
+                if(beforedoc.productOptions[each].price != afterdoc.productOptions[each].price){
+                    const details = {
+                        productid: context.params.productid,
+                        option: each,
+                        newPrice: afterdoc.productOptions[each].price,
+                        notificationMessage: `Price of ${afterdoc.productName} has ${(beforedoc.productOptions[each].price < afterdoc.productOptions[each].price)?('increased'):('decreased')} from ${beforedoc.productOptions[each].price} to ${afterdoc.productOptions[each].price}`
+                    };
+                    console.log('priceUpdate details',details);
+                    return priceChangeAction(details)
+                }
+                if(beforedoc.productOptions[each].inStock ==true &&  afterdoc.productOptions[each].inStock ==false){
+                    const details = {
+                        productid: context.params.productid,
+                        option: each,
+                        notificationMessage: `${afterdoc.productName} has gone out of stock`
+                    }
+                    console.log('priceUpdate details',details);
+                    return outOfStockAction(details)
+                }
+            })
+        }else{
+            if(beforedoc.price != afterdoc.price){
+                const details = {
+                    productid: context.params.productid,
+                    option: false,
+                    newPrice: afterdoc.price,
+                    notificationMessage: `Price of ${afterdoc.productName} has ${(beforedoc.price<afterdoc.price)?('increased'):('decreased')} from ${beforedoc.price} to ${afterdoc.price}`
+                }
+                console.log('priceUpdate details',details);
+                return priceChangeAction(details)
+            }
+            if(beforedoc.inStock ==true &&  afterdoc.inStock ==false){
+                const details = {
+                    productid: context.params.productid,
+                    option: false,
+                    notificationMessage: `${afterdoc.productName} has gone out of stock`
+                }
+                console.log('priceUpdate details',details);
+                return outOfStockAction(details)
+            }
+        }
+    })
+
+const outOfStockAction = (details)=>{
+    return admin.firestore().collectionGroup('cart').where('productid','==',details.productid).where('option','==',details.option).get().then(cartDocs=>{
+        var batch = admin.firestore().batch();
+        cartDocs.forEach((doc)=>{
+            var path = doc.ref.path;
+            var pathRef = admin.firestore().doc(path);
+            var notificationPath = doc.ref.path.split('cart').join('cartNotifications');
+            var notificationPathRef = admin.firestore().doc(notificationPath);
+            batch.delete(pathRef);
+            batch.set(notificationPathRef, { notificationMessage: details.notificationMessage, createdAt: new Date() })  
+        })
+        return batch.commit().then(()=>{ 
+            return console.log('batch committed');
+        });
+    });
+}
+const priceChangeAction = (details)=>{
+    return admin.firestore().collectionGroup('cart').where('productid','==',details.productid).where('option','==',details.option).get().then(cartDocs=>{
+        var batch = admin.firestore().batch();
+        cartDocs.forEach((doc)=>{
+            var path = doc.ref.path;
+            var pathRef = admin.firestore().doc(path);
+            var notificationPath = doc.ref.path.split('cart').join('cartNotifications');
+            var notificationPathRef = admin.firestore().doc(notificationPath);
+            batch.update(pathRef, { productPrice: parseFloat(details.newPrice) } );
+            batch.set(notificationPathRef, { notificationMessage: details.notificationMessage, createdAt: new Date() })  
+        })
+        return batch.commit().then(()=>{ 
+            return console.log('batch committed');
+        });
+    });
+}

@@ -11,6 +11,7 @@ import {v1 as uuid } from 'uuid';
 import queryString from 'query-string'
 import { withRouter, useHistory } from 'react-router-dom';
 import { searchAction, searchResetAction } from '../store/actions/searchActions';
+import InfoCard from '../components/InfoCard';
 
 
 function Store(props) {
@@ -41,11 +42,11 @@ function Store(props) {
               ))}
               {
                 (searchMessage == 'SEARCH_RESULTS_NOT_FOUND')
-                ?( <p>{searchError}</p> ):null
+                ?( <InfoCard><p className="flow-text center">Nothing Relevant Found</p></InfoCard> ):null
               }
               {
                 (searchMessage == 'SEARCH_IN_PROGRESS' )
-                ?( <p>Loading...</p> ):null
+                ?( <InfoCard><p className="flow-text center">Loading...</p></InfoCard> ):null
               }
             </div>
         </div>

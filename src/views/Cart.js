@@ -7,11 +7,13 @@ import { auth } from 'firebase';
 import { useFirebaseConnect, useFirestoreConnect, isLoaded } from 'react-redux-firebase';
 
 import { v1 as uuid } from 'uuid';
-import { updateCartAction, addCartAction, removeFromCartAction, cartMessageReset } from '../store/actions/cartUpdateActions';
+import { updateCartAction, deleteNotification, addCartAction, removeFromCartAction, cartMessageReset } from '../store/actions/cartUpdateActions';
 import { testAction } from '../store/actions/testAction';
 import { db } from '../config/FirebaseConfig';
 import { useHistory, NavLink } from 'react-router-dom';
 import Delayed from '../utils/Delayed';
+import _ from 'lodash';
+import InfoCard from '../components/InfoCard.js'
 
 function Cart(props) {
     const history = useHistory();
@@ -31,18 +33,31 @@ function Cart(props) {
         doc: authuid,
         subcollections: [{ collection: 'cart' }], 
         storeAs: 'cart' 
-    } ])
+    },{
+        collection: 'users',
+        doc: authuid,
+        subcollections: [{collection:'cartNotifications'}],
+        storeAs: 'cartNotifications'
+    }])
     const cartCollection = useSelector(state=> state.firestore.ordered.cart)
     const [cart,setCart] = useState([]);
+    const [log, setLog ] = useState('');
     useEffect(()=>{
-        if(!isLoaded(cartCollection)) return;
-        setCart(cartCollection);
+        if(!isLoaded(cartCollection)) return setLog('LOADING');
+        if(!cartCollection || cartCollection.length == 0){ setCart([]); return setLog('EMPTY');}
+        setLog('FETCHED');
+        setCart(cartCollection)
         var newTotal = cartCollection.reduce((tot,each)=>(tot+each.productPrice*each.cartQty),0)
-        console.log(total);
+        // console.log(total);
         setTotal(newTotal);
     },[cartCollection])
+    
+    const cartNotifications = useSelector(state=> _.orderBy(state.firestore.ordered.cartNotifications ?? [], ['createdAt'],['desc'])) ?? [];
+    useEffect(()=>{ 
+        // console.log(cartNotifications);
+    },[cartNotifications]);
 
-    const {updateCartAction, removeFromCart, cartMessageReset} = props;
+    const {updateCartAction, removeFromCart, cartMessageReset, deleteNotification} = props;
     const updateCart = (cartid, qty)=>{
         var newcart = cart.map((each)=>((each.id ==cartid)?({...each, cartQty:qty}):(each)));
         var newTotal = newcart.reduce((tot,each)=>(tot+each.productPrice*each.cartQty),0)
@@ -50,6 +65,7 @@ function Cart(props) {
         setCart(newcart);
         updateCartAction(cartid, qty);
     }
+
     const cartFunc={
         updateCart,
         removeFromCart
@@ -78,54 +94,61 @@ function Cart(props) {
                   {cart && cart.map(cartItem=>( <CartCard key={uuid()} cartFunc={cartFunc} cartItem={cartItem} /> ))}
                 </div>
             </div>);
-    const CartPageMarkUpJSX = (
-            <div className="row">
-                {(cart && cart.length>0)?(
-                    <Fragment>
-                        {cartTotalSectionJSX}
-                        {cartItemsJSX}
-                    </Fragment>
-                ):(
-                    <div className="center">
-                        <div className="row">
-                        <div className="col s8 m6 l6 offset-s2 offset-m3 offset-l3">
-                        <div className="card round-card">
-                        <div className="card-content">
-                            <p className="flow-text">
-                                Your Cart is Empty
-                            </p>
-                            <NavLink to='/store/all'><div className="btn dark_btn">Shop Now</div></NavLink>
-                        </div>    
-                        </div>    
-                        </div>
-                        </div>
-                    </div>
-                )}
+    
+    const cartNotificationsJSX = (cartNotifications&& cartNotifications.length > 0)?(
+        <div className="cartNotifications">
+        <div className="card round-card">
+        <div className="card-content">
+        <div className="row">
+        {cartNotifications.map(each=>(
+            <Fragment key={uuid()}>
+            <div className="col s9">
+                <p 
+                style={{'lineHeight':'3'}}
+                className="head regular_text center">{each.notificationMessage}</p>
             </div>
-    )
-
+            <div className="col s3 center">
+                <div
+                 onClick={()=>{deleteNotification(each.id)}}
+                 className="btn-floating btn-small red_btn"><i className="material-icons">clear</i></div>
+            </div>
+            </Fragment>
+        ))}
+        </div>
+        </div>
+        </div>
+        </div>
+    ):(null)
+    const CartPageMarkUpJSX = (
+        <div className="row">
+            {(cart && cart.length>0)?(
+                <Fragment>
+                    {cartTotalSectionJSX}
+                    {cartItemsJSX}
+                </Fragment>
+            ):(
+                <Fragment>
+                    {(log == 'LOADING')?( <InfoCard><p className="center flow-text">Loading...</p> </InfoCard> ):(null)}
+                    {(log == 'EMPTY')?( <InfoCard><p className="center flow-text">Your Cart is Empty</p> </InfoCard> ):(null)}
+                </Fragment>
+            )}
+        </div>
+)
     return (
         <div className="Cart">
             <div className="container">
-                <h5 className="primary-green-dark-text">Your Shopping <span className="heavy_text">Cart</span></h5>
+                <h5 className="primary-green-dark-text center">Your Shopping <span className="heavy_text">Cart</span></h5>
+                {cartNotificationsJSX}
                 {(authuid!='default')?(
-                    <Delayed waitBeforeShow={5000} >
-                        {CartPageMarkUpJSX}
+                    <Delayed waitBeforeShow={500}>
+                        <Fragment>{CartPageMarkUpJSX}</Fragment>
                     </Delayed>
                 ):(
-                    <div className="center">
-                        <div className="row">
-                        <div className="col s8 m6 l6 offset-s2 offset-m3 offset-l3">
-                        <div className="card round-card">
-                        <div className="card-content">
-                            <p className="flow-text">
-                                Please <span className="heavy_text primary-green-dark-text">SignIn</span> To Continue
-                            </p>
-                        </div>    
-                        </div>    
-                        </div>
-                        </div>
-                    </div>
+                    <InfoCard>
+                        <p className="flow-text center">
+                        Please <span className="heavy_text primary-green-dark-text">SignIn</span> To Continue
+                        </p>
+                    </InfoCard>
                 )}
             </div>
         </div>
@@ -145,7 +168,8 @@ const mapDispatchToProps = (dispatch)=>{
             dispatch(updateCartAction(cartid, cartQty))
         },
         removeFromCart : (cartid)=>{ dispatch( removeFromCartAction(cartid) ) },
-        cartMessageReset: ()=>{ dispatch( cartMessageReset() ) }
+        cartMessageReset: ()=>{ dispatch( cartMessageReset() ) },
+        deleteNotification: (docid)=>{ dispatch( deleteNotification(docid) )}
     }
 }
 
