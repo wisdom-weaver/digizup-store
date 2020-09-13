@@ -3,6 +3,8 @@ import { NavLink, useHistory, withRouter } from 'react-router-dom'
 import {v1 as uuid} from 'uuid';
 import { connect, useSelector } from 'react-redux';
 
+import logo from '../assets/img/digi-logo-small.png'
+
 import Cart from "@material-ui/icons/AddShoppingCart";
 import Close from '@material-ui/icons/CloseRounded';
 import Menu from '@material-ui/icons/MenuRounded';
@@ -157,7 +159,7 @@ function Navbar(props) {
             <span className="cart_items_count">{cartCount}</span>
           </NavLink>
           <nav>
-              <div className="nav__left">
+              <div className="nav__left valign-wrapper">
               <span onClick={()=>{ setMenuOpenState(!menuOpenState) }}>
                 {
                   (!menuOpenState)?
@@ -165,9 +167,23 @@ function Navbar(props) {
                   (<Close className="menu-icon" />)
                 }
               </span>
+                
+              {/* <NavLink onClick={()=>{setMenuOpenState(false)}} exact to="/">
+              <span className="navbar__logo">
+                Digizup    
+              </span>
+              </NavLink> */}
               <NavLink onClick={()=>{setMenuOpenState(false)}} exact to="/">
-                <span className="navbar__logo">Digizup</span>
-                {/* <span>{width}x{height}</span> */}
+              <span className="mini-logo-container">
+                <img 
+                className="mini-logo"
+                src={logo}/>
+              </span>
+              </NavLink>
+              <NavLink onClick={()=>{setMenuOpenState(false)}} exact to="/">
+              <span className="navbar__logo">
+                Store
+              </span>
               </NavLink>
               </div>
               

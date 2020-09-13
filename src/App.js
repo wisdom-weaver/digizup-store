@@ -17,6 +17,10 @@ import Order from './views/Order';
 import Account from './views/Account';
 import AccountAddresses from './views/AccountAddresses';
 import AccountPayments from './views/AccountPayments';
+import Err404 from './views/Err404';
+import Loading from './components/Loading';
+import LoadingFullScreen from './components/LoadingFullScreen';
+import AppFooter from './components/AppFooter';
 
 function App() {
   return (
@@ -38,13 +42,17 @@ function App() {
             <Route exact path="/account/order/:orderid"> <Order /> </Route>          
             <Route exact path="/account/addresses"> <AccountAddresses /> </Route>          
             <Route exact path="/account/payments"> <AccountPayments /> </Route>          
-            <Route exact path="/test"> <Test /> </Route>          
+            {/* <Route exact path="/loading"> <Loading /> </Route>           */}
+            {/* <Route exact path="/loadingfull"> <LoadingFullScreen /> </Route>           */}
+            {/* <Route exact path="/err404"> <Err404 /> </Route>           */}
             <Route exact path="/"> <Home /> </Route>
+            <Route component={Err404} />
           </Switch>
+          <AppFooter />
         </ScrollToTop>
       </BrowserRouter>
     </div>
   );
 }
 
-export default App;
+export default App; 

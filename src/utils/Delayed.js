@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Loading from '../components/Loading';
 
 class Delayed extends React.Component {
 
@@ -15,7 +16,7 @@ class Delayed extends React.Component {
     }
 
     render() {
-        return this.state.hidden ? 'LOADING...........' : this.props.children;
+        return this.state.hidden ? ( <Loading /> ) : this.props.children;
     }
 }
 

@@ -46,6 +46,7 @@ import { ReactReduxFirebaseProvider, getFirebase, isLoaded, firebaseConnect  } f
 import { createFirestoreInstance, getFirestore, reduxFirestore } from 'redux-firestore'
 
 import firebase from "./config/FirebaseConfig";
+import LoadingFullScreen from './components/LoadingFullScreen';
 //----------------------------------------------------------
 
 //store
@@ -83,7 +84,7 @@ const rrfProps = {
 //----------------------------------------------------------
 const AuthIsLoaded = ( {children} )=>{
   const auth = useSelector( state=>state.firebase.auth );
-  if(!isLoaded(auth)) return <div>Loading...</div>;
+  if(!isLoaded(auth)) return (<LoadingFullScreen /> );
   return children;
 }
 //----------------------------------------------------------
