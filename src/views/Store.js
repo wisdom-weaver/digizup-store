@@ -12,6 +12,7 @@ import queryString from 'query-string'
 import { withRouter, useHistory } from 'react-router-dom';
 import { searchAction, searchResetAction } from '../store/actions/searchActions';
 import InfoCard from '../components/InfoCard';
+import Loading from '../components/Loading';
 
 
 function Store(props) {
@@ -46,7 +47,7 @@ function Store(props) {
               }
               {
                 (searchMessage == 'SEARCH_IN_PROGRESS' )
-                ?( <InfoCard><p className="flow-text center">Loading...</p></InfoCard> ):null
+                ?( <Loading /> ):null
               }
             </div>
         </div>

@@ -193,7 +193,7 @@ function Product(props) {
             <h5 className="left-align head regular_text">Features</h5>
             <p className="line-break" key={uuid()}>
             {renderedProduct.features.map((feature,index)=>(
-                <Fragment><span className="head">‣ </span>{feature}{"\n\n"}</Fragment>
+                <Fragment key={uuid()}><span className="head">‣ </span>{feature}{"\n\n"}</Fragment>
             ))}
             </p>
         </Fragment>

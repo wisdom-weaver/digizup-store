@@ -1,5 +1,8 @@
 const functions = require('firebase-functions');
-const admin = require('firebase-admin')
+const express = require('express');
+const stripe = require('stripe')('sk_test_51HR0lzK03SbZNRhEdnS9YmPHGGoRucIcnsxu5g5eL9AePGTqx5AIyxi3HkjecDiTfOVWFtAcxB6bAFy2bYFx8CYR00BZGJ5Dd6');
+const cors = require('cors');
+const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
 // // Create and Deploy Your First Cloud Functions
@@ -9,6 +12,52 @@ admin.initializeApp(functions.config().firebase);
 //   functions.logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
+
+const app = express();
+app.use(cors({origin: true}));
+app.use(express.json());
+app.get('/',(req,res)=>{
+    res.status(200).send('hello everyone this is digizup store api')
+})
+app.get('/danish',(req,res)=>{
+    res.status(200).send("hello I'm Danish")
+})
+app.post('/payments/create', async (req, res)=>{
+    const total = req.query.total;
+    // console.log('payment request recieved>>', total);
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount: total, //this is in sub units
+        currency: "inr"
+    })
+    res.header( "Access-Control-Allow-Origin" ).status(201).send({
+        clientSecret: paymentIntent.client_secret
+    })
+})
+app.post('/requestCancellation', async (req, res)=>{
+    ;
+    // console.log('cancellaiton request');
+    var  {userid, orderid, cancellationMessage} = req.query;
+    // console.log(userid, orderid, cancellationMessage);
+    if(cancellationMessage == '') cancellationMessage= 'Cancellation Requested';
+    if( !userid || !orderid) return res.header( "Access-Control-Allow-Origin" ).status(201).send();
+    const oaid = `${userid}-${orderid}`;
+    return admin.firestore().collection('ordersForAdmins').doc(oaid).get()
+    .then((doc)=>{
+        const data = doc.data();
+        return admin.firestore().collection('ordersForAdmins').doc(oaid).update({
+            cancellationMessage: cancellationMessage,
+            tracking: [{title:'Cancellation Requested', updateTime: new Date()}, ...data.tracking],
+            status:'Cancellation Requested'
+        })
+    }).then(()=>{
+        res.header( "Access-Control-Allow-Origin" ).status(201).send();
+    }).catch(()=>{
+        res.header( "Access-Control-Allow-Origin" ).status(201).send();
+    })
+
+})
+
+exports.api = functions.https.onRequest(app)
 
 const createOrderForAdmins = (orderForAdminsDoc,orderForAdminsDocId)=>{
     return admin.firestore().collection('ordersForAdmins')
@@ -50,24 +99,6 @@ exports.orderPlaced = functions.firestore
         // return console.log('order req',order);
     })
 
-exports.orderUpdatedUserSide = functions.firestore
-    .document('users/{userid}/orders/{orderid}')
-    .onUpdate((change,context)=>{
-
-        const order = change.after.data();
-        const update = {
-            oaid: `${context.params.userid}-${context.params.orderid}`,
-            data:{
-                tracking : order.tracking,
-                status: order.status,
-                cancellationMessage: order.cancellationMessage,
-                isOpen: order.isOpen
-            }
-        }
-        return updateOrderAdminSide(update);
-        // return console.log('order req',order);
-    })
-
 exports.orderUpdatedAdminsSide = functions.firestore
     .document('ordersForAdmins/{oaid}')
     .onUpdate((change, context)=>{
@@ -83,9 +114,7 @@ exports.orderUpdatedAdminsSide = functions.firestore
                 isOpen: oa.isOpen
             }
         }
-        // console.log(oaid);
         return updateOrderUserSide(update);
-        // return console.log('order req',order);
     })
 
 exports.productPriceUpdated = functions.firestore
@@ -103,7 +132,7 @@ exports.productPriceUpdated = functions.firestore
                         newPrice: afterdoc.productOptions[each].price,
                         notificationMessage: `Price of ${afterdoc.productName} has ${(beforedoc.productOptions[each].price < afterdoc.productOptions[each].price)?('increased'):('decreased')} from ${beforedoc.productOptions[each].price} to ${afterdoc.productOptions[each].price}`
                     };
-                    console.log('priceUpdate details',details);
+                    // console.log('priceUpdate details',details);
                     return priceChangeAction(details)
                 }
                 if(beforedoc.productOptions[each].inStock ==true &&  afterdoc.productOptions[each].inStock ==false){
@@ -112,7 +141,7 @@ exports.productPriceUpdated = functions.firestore
                         option: each,
                         notificationMessage: `${afterdoc.productName} has gone out of stock`
                     }
-                    console.log('priceUpdate details',details);
+                    // console.log('priceUpdate details',details);
                     return outOfStockAction(details)
                 }
             })
@@ -124,7 +153,7 @@ exports.productPriceUpdated = functions.firestore
                     newPrice: afterdoc.price,
                     notificationMessage: `Price of ${afterdoc.productName} has ${(beforedoc.price<afterdoc.price)?('increased'):('decreased')} from ${beforedoc.price} to ${afterdoc.price}`
                 }
-                console.log('priceUpdate details',details);
+                // console.log('priceUpdate details',details);
                 return priceChangeAction(details)
             }
             if(beforedoc.inStock ==true &&  afterdoc.inStock ==false){
@@ -133,7 +162,7 @@ exports.productPriceUpdated = functions.firestore
                     option: false,
                     notificationMessage: `${afterdoc.productName} has gone out of stock`
                 }
-                console.log('priceUpdate details',details);
+                // console.log('priceUpdate details',details);
                 return outOfStockAction(details)
             }
         }
@@ -171,3 +200,4 @@ const priceChangeAction = (details)=>{
         });
     });
 }
+

@@ -10,7 +10,7 @@ function Err404() {
         <div className="card-content">
         <div className="center">
             <div className="image-container">
-            <img src={notFoundImg} alt="" srcset=""/>
+            <img src={notFoundImg} alt="" />
             </div>
             <h4 className="center head">Err!! Page Not Found</h4>
         </div>

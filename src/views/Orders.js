@@ -6,7 +6,7 @@ import { useFirestoreConnect } from 'react-redux-firebase';
 import Delayed from '../utils/Delayed';
 import OrderCard from '../components/OrderCard';
 import _ from 'lodash';
-
+import { v1 as uuid } from 'uuid'
 
 function Orders() {
     
@@ -45,7 +45,7 @@ function Orders() {
             ):(
                 <div className="row">
                     { orders.map((order)=>( 
-                        <div className="col s12 m8 l8 offset-m2 offset-l2">
+                        <div key={uuid()} className="col s12 m8 l8 offset-m2 offset-l2">
                             <OrderCard order={order} />
                         </div>
                      )) }

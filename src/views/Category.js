@@ -2,7 +2,7 @@ import React, { useEffect, useState, Fragment } from 'react'
 import { connect, useSelector } from 'react-redux'
 import { withRouter, NavLink } from 'react-router-dom'
 import { compose } from 'redux'
-import { firestoreConnect } from 'react-redux-firebase';
+import { firestoreConnect, isLoaded } from 'react-redux-firebase';
 import { db } from '../config/FirebaseConfig';
 import 'materialize-css';
 import { Carousel, Icon, Modal, Button } from 'react-materialize';
@@ -13,6 +13,9 @@ import 'react-owl-carousel2/lib/styles.css'; //Allows for server-side rendering.
 import 'react-owl-carousel2/src/owl.carousel.css'; //Allows for server-side rendering.
 import 'react-owl-carousel2/src/owl.theme.green.css'; //Allows for server-side rendering.
 import Delayed from '../utils/Delayed';
+import Loading from '../components/Loading';
+import LoadingFullScreen from '../components/LoadingFullScreen';
+import InfoCard from '../components/InfoCard';
 
 function Category(props) {
     const category = props.match.params.category ?? 'all';
@@ -41,7 +44,8 @@ function Category(props) {
         const snaps = await db.collection('products').where('categories','array-contains-any',keywords).get();
         if(snaps.empty){console.log('empty');return; }
         var localProducts = [];
-        snaps.forEach(doc=>{
+        snaps.forEach((doc,index)=>{
+            if(index>=20) return;
             var data = doc.data();
             var pro = {};
             if(data.hasOptions == true){
@@ -104,33 +108,30 @@ function Category(props) {
         </div>
 
     ):(null)
-    const CategoryPageJSX = (cat)?(
+
+    const CategoryPageJSX = (isLoaded(categoriesCollection))?(
         <Fragment>
-            {CategoryBannerJSX}
-            {CategoryProductsJSX}
-        </Fragment>
-    ):(
-        <div className="row">
-            <div className="col s12 m6 offset-m2">
-                <div className="card round-card">
-                    <div className="card-content">
-                        <h6 className="center">Sorry this category doesnot exist</h6>
-                        <div className="center">
-                            <NavLink to="/store"> <div className="btn dark_btn">Visit Store</div> </NavLink>
-                        </div>
-                    </div>
+        {(cat)?(
+            <Fragment>
+                {CategoryBannerJSX}
+                {CategoryProductsJSX}
+            </Fragment>
+        ):(
+            <Delayed waitBeforeShow={1000}>
+            <InfoCard>
+                <h6 className="center">Sorry this category doesnot exist</h6>
+                <div className="center">
+                    <NavLink to="/store"> <div className="btn dark_btn">Visit Store</div> </NavLink>
                 </div>
-            </div>
-        </div>
-    );
+            </InfoCard>
+            </Delayed>
+        )}
+        </Fragment>
+    ):(<LoadingFullScreen /> )
 
     return (
         <div className="Category Page" >
-            
-            <Delayed waitBeforeShow={2000} >
                 {CategoryPageJSX}
-            </Delayed>
-            
         </div>
     )
 }

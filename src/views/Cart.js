@@ -14,6 +14,7 @@ import { useHistory, NavLink } from 'react-router-dom';
 import Delayed from '../utils/Delayed';
 import _ from 'lodash';
 import InfoCard from '../components/InfoCard.js'
+import Loading from '../components/Loading';
 
 function Cart(props) {
     const history = useHistory();
@@ -128,7 +129,7 @@ function Cart(props) {
                 </Fragment>
             ):(
                 <Fragment>
-                    {(log == 'LOADING')?( <InfoCard><p className="center flow-text">Loading...</p> </InfoCard> ):(null)}
+                    {(log == 'LOADING')?( <Loading /> ):(null)}
                     {(log == 'EMPTY')?( <InfoCard><p className="center flow-text">Your Cart is Empty</p> </InfoCard> ):(null)}
                 </Fragment>
             )}

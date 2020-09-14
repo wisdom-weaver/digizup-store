@@ -12,9 +12,15 @@ import { addAddressAction, addCardAction, placeOrderAction } from '../store/acti
 import Delayed from '../utils/Delayed';
 import { priceFormat } from '../utils/utils';
 
+import axios from '../axios/axios'
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+
+
 function Checkout(props) {
     
     const authuid = useSelector(state=> state.firebase.auth.uid ) ?? 'default';
+    const profile = useSelector(state=> state.firebase.profile ) ?? {};
+    useEffect(()=>{console.log(profile)},[profile])
     const history = useHistory();
 
     const [stage, setStage] = useState(0);
@@ -39,15 +45,9 @@ function Checkout(props) {
         doc: authuid,
         subcollections: [{collection:'addresses'}],
         storeAs: 'addresses'
-    },{
-        collection: 'users',
-        doc: authuid,
-        subcollections: [{collection:'cards'}],
-        storeAs: 'cards'
     }]);
 
     const addAddress = props?.addAddress;
-    const addCard = props?.addCard;
     const placeOrder = props?.placeOrder;
 
     const cart =  useSelector(state=> state.firestore.ordered.cart) ?? []
@@ -66,16 +66,10 @@ function Checkout(props) {
         if(addressIndex==-1){setAddressIndex(0); }
     },[addresses]);
 
-    const cards = useSelector(state=> state.firestore.ordered.cards) ?? [];
-    useEffect(()=>{ 
-        // console.log('cards',cards);
-        if(!cards || cards.length==0) return;
-        if(cardIndex == -1) setCardIndex(0);
-    },[cards]);
 
     const [total,setTotal] = useState(0);
 
-    useEffect(()=>{},[cart, addresses, cards])
+    useEffect(()=>{},[cart, addresses])
 
     const initAddress = { fullName    :'', addressLine :'', city    :'', state   :'', country :'', pincode :'', phoneNo :'' }
     const [newAddress, setNewAddress] = useState(initAddress);
@@ -100,24 +94,40 @@ function Checkout(props) {
         else{setStage(1);}
     }
 
-    const submitNewCard = (newCard)=>{
-        addCard(newCard);
-        setNewCard(initCard);
-    } 
-
     const submitPaymentMode = ()=>{
-        // console.log('paymentModeIndex', paymentModeIndex, 'cardIndex', cardIndex);
-        if(paymentModeIndex == 0 && cardIndex > -1) setStage(2);
-        if(paymentModeIndex > 0) setStage(2);
+        if(paymentModeIndex >= 0) setStage(2);
     }
     const proceedToPayment= ()=>{
         setStage(3);
     }
 
-    const payNow = ()=>{
+    const stripe = useStripe();
+    const elements = useElements();
+    const [error, setError] = useState(null);
+    const [errorLog, setErrorLog] = useState('');
+    const [disabled, setDisabled] = useState(true);
+    const [processing, setProcessing] = useState(null);
+    const [succeeded, setSucceeded] = useState(null);
+    const [clientSecret, setClientSecret] = useState(true);
+    useEffect(()=>{
+        if(total == 0)return;
+       const getClientSecret = async ()=>{
+           const response = await axios({
+               method: 'post',
+               url: `/payments/create?total=${total*100}`
+           })
+           setClientSecret(response.data.clientSecret)
+       }
+       getClientSecret();
+    },[total])
+    const handleCardElementChange = (event)=>{
+        setDisabled(event.empty);
+        setError(event.error ? event.error.message : "");
+    }
+
+    const placeOrderFn = ()=>{
         if(addressIndex< 0 )return;
         if(paymentModeIndex< 0 )return;
-        if(paymentModeIndex == 0 && cardIndex < 0)return;
         var order = { 
             cart: cart.map(each=>({
                     cartQty: each.cartQty,
@@ -142,16 +152,41 @@ function Checkout(props) {
             cartCount: cart.reduce((tot,each)=>(tot+each.cartQty),0)??0,
             defaultImage: cart[0].defaultImage
         }
-        if(paymentModeIndex ==0 && cardIndex > -1){
-            order = {...order, card:{cardHolderName: cards[cardIndex].cardHolderName, cardNo: 'XXXX XXXX XXXX '+cards[cardIndex].cardNo.slice(12)}
-            }
-        }else{
-            order = {...order}
-        }
-        console.log(order);
         placeOrder(order);
-        history.push('account/orders');
+        history.replace('/account/orders');
     }
+
+    const payNow = async (e)=>{
+        e.preventDefault();
+        if(addressIndex< 0 )return;
+        if(paymentModeIndex< 0 )return;
+        
+        console.log('submit');
+        setProcessing(true);
+        const payload = await stripe.confirmCardPayment(clientSecret,{
+            payment_method: {
+                card: elements.getElement(CardElement),
+                billing_details: {
+                    name: `${profile.firstName} ${profile.lastName} - ${authuid}`
+                },
+            }
+        }).then((resp)=>{
+            if(resp?.paymentIntent?.status == 'succeeded'){
+                setSucceeded(true);
+                setProcessing(false);
+                setError(null);
+                setErrorLog('');
+                placeOrderFn();
+                
+            }else{
+                setProcessing(false);
+                setErrorLog(resp.error.message) 
+            }
+            // console.log(resp);
+        })
+        // history.push('account/orders');
+    }
+
 
     const deliverySectionJSX = (
         <div className="deliverySection">
@@ -169,7 +204,7 @@ function Checkout(props) {
                         <div className="card-content">
                             <p className="flow-text"> 
                             <label>
-                              <input name="addressGroup" type="radio" checked={(index == addressIndex)} />
+                              <input name="addressGroup" type="radio" checked={(index == addressIndex)} readOnly={true} />
                               <span className="primary-green-dark-text heavy_text">{eachLoc.fullName}</span>
                             </label>
                              </p>
@@ -258,104 +293,16 @@ function Checkout(props) {
     )
     
      var paymentModes = [
-         {  paymentType :'card', paymentModeHead:"Credit / Debit Card",             paymentModeIcon:'payment',      paymentModeInner:(
-             <div>
-                 <p>We accept  VISA, MasterCard and Western Union credit/debit cards only.* </p> 
-                 <div className="row">
-                    {(!cards || cards.length == 0 )?(
-                        <p className="center">
-                            No Saved Card Found
-                            Please add atleast one.
-                        </p>
-                    ):(
-                        <Fragment>
-                            <p className="flow-text center">Saved Cards: </p>
-                            {cards.map((card,index)=>(
-                             <div className="col s12 m6" key={uuid()}>
-                                 <div className="card round-card"
-                                 onClick={()=>{setCardIndex(index)}} 
-                                 >
-                                     <div className="card-content">
-                                         <label>
-                                             <input name="cardsGroup" type="radio" checked={( index == cardIndex )} />
-                                             <span></span>
-                                         </label>
-                                         {card?(
-                                            <div>
-                                                <p>Card Holder: {card.cardHolderName}</p>
-                                                <p>Card No: {'XXXX XXXX XXXX '+card.cardNo.slice(12)}</p>
-                                                <p>Card Expiry: { card.cardExpMM+'/'+card.cardExpYY }</p>
-                                            </div>
-                                         ):(null)}
-                                     </div>
-                                 </div>
-                             </div>
-                            ))}
-                        </ Fragment>  
-                    )}
-                    <div className="col s12"></div>
-                    <div className="col s12 m6 center">
-                     <Modal
-                       actions={[
-                         (<Button flat modal="close" node="button" waves="red">Close</Button>),
-                         (<Button onClick={()=>{ submitNewCard(newCard) }} flat modal="close" node="button" waves="green">Add Card</Button>)
-                       ]}
-                       bottomSheet={false}
-                       fixedFooter={true}
-                       header="Add a new Card"
-                       id="addCardModal"
-                       open={false}
-                       options={{
-                         dismissible: true,
-                         endingTop: '16%',
-                         inDuration: 250,
-                         onCloseEnd: null,
-                         onCloseStart: null,
-                         onOpenEnd: null,
-                         onOpenStart: null,
-                         opacity: 0.5,
-                         outDuration: 250,
-                         preventScrolling: true,
-                         startingTop: '55%'
-                       }}
-                     //   root={[object HTMLBodyElement]}
-                       trigger={<div className="btn light_btn"> <i className="material-icons">add</i> <span>Add Card</span> </div>}
-                     >
-                         <div className="row">
-                             <div className="input-field col s12">
-                                 <i className="material-icons prefix">account_circle</i>
-                                 <input onChange={(e)=>{setNewCard({...newCard, cardHolderName:e.target.value})}} value={newCard.cardHolderName} id="cardHolderName-addCard" type="text" required />
-                                 <label  htmlFor="cardHolder-addCard">Full Name</label>
-                             </div>
-                             <div className="input-field col s8">
-                                 <i className="material-icons prefix">payment</i>
-                                 <input onChange={(e)=>{setNewCard({...newCard, cardNo:e.target.value})}} value={newCard.cardNo} id="cardNo-addCard" type="text" required />
-                                 <label htmlFor="cardNo-addCard">Card Line</label>
-                                 {/* <NumberFormat customInput={TextField} format="#### #### #### ####"/> */}
-                             </div>
-                             <div className="input-field col s2">
-                                 <input onChange={(e)=>{setNewCard({...newCard, cardExpMM:e.target.value})}} value={newCard.cardExpMM} id="cardExpMM-addCard" type="text" required />
-                                 <label htmlFor="cardExpMM-addCard">MM</label>
-                             </div>
-                             <div className="input-field col s2">
-                                 <input onChange={(e)=>{setNewCard({...newCard, cardExpYY:e.target.value})}} value={newCard.cardExpYY} id="cardExpYY-addCard" type="text" required />
-                                 <label htmlFor="cardExpYY-addCard">YY</label>
-                             </div>
-                         </div>
-                     </Modal>
-                    </div>
-                 </div>
-             </div>
-         ) },
- 
+         { paymentType :'card', paymentModeHead:"Credit / Debit Card",             paymentModeIcon:'payment',      paymentModeInner:( <p>We accept Visa, MasterCard Credit and debit cards.</p> ) },
+
          { paymentType:'crypto', paymentModeHead:"Crypto Currencies",               paymentModeIcon:'fingerprint',  paymentModeInner:( <p>coinbase e-commerce * </p> ) },
- 
+
          { paymentType:'paypal', paymentModeHead:"PayPal",                          paymentModeIcon:'filter_drama', paymentModeInner:( <p>paypal Integration* </p> ) },
- 
+
          { paymentType:'paytm', paymentModeHead:"Paytm",                           paymentModeIcon:'filter_drama', paymentModeInner:( <p>paytm Integration* </p> ) },
- 
+
          { paymentType:'cod', paymentModeHead:"COD/POD (Cash/Pay On Delivery)",  paymentModeIcon:'attach_money', paymentModeInner:( <p>we acccept cash aswell as digital payment options on your door step </p> ) }
- 
+
      ]
  
     const paymentModesSectionJSX = (
@@ -370,7 +317,7 @@ function Checkout(props) {
                     header={( 
                     <div className="payment-mode-option">
                         <label>
-                            <input name="paymentModesGroup" type="radio" checked={( index == paymentModeIndex )} />
+                            <input name="paymentModesGroup" type="radio" checked={( index == paymentModeIndex )} readOnly={true}/>
                             <span></span>
                         </label>
                         <p className=" payment-mode-option-name primary-green-dark-text heavy_text">{mode.paymentModeHead}</p>
@@ -384,11 +331,7 @@ function Checkout(props) {
                 ))}
             </Collapsible>
             <div className="center">
-                {(paymentModeIndex ==0 && cardIndex==-1)?(
-                    <div className="btn dark_btn disabled">Order Summary</div>
-                ):(
-                    <div onClick={()=>{ submitPaymentMode()}} className="btn dark_btn">Order Summary</div>
-                )}
+                <div onClick={()=>{ submitPaymentMode()}} className="btn dark_btn">Order Summary</div>
             </div>
         </div>
     )
@@ -417,18 +360,6 @@ function Checkout(props) {
             </div>
             <div className="summary-payment-mode">
                 <h6 className="center">Payment Option: <Icon>{paymentModes[paymentModeIndex].paymentModeIcon}</Icon> {paymentModes[paymentModeIndex].paymentModeHead}</h6>
-                {(paymentModeIndex==0 && cards && cardIndex> -1)?(
-                    <div className="center">
-                    <div className="row">
-                        <div className="card col s8 m8 l6 offset-m2 offset-l3 round-card">
-                            <div className="card-content left-align">
-                                <p className="heavy_text">Card Holder: {cards[cardIndex].cardHolderName}</p>
-                                <p className="heavy_text">Card Number: {'XXXX XXXX XXXX '+cards[cardIndex].cardNo.slice(12)}</p>
-                                <p className="heavy_text">Card Expiry: {cards[cardIndex].cardExpMM+'/'+cards[cardIndex].cardExpYY}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>):(null)}
             </div>
             <div className="summary-order-details">
                 <div className="row">
@@ -460,7 +391,11 @@ function Checkout(props) {
                         <div onClick={()=>{setStage(0)}} className="btn light_btn">Edit Address/Payment Options</div>
                     </div>
                     <div className="col s12 m6 center">
-                        <div onClick={()=>{proceedToPayment()}} className="btn dark_btn">Proceed To Payment</div>
+                        {(paymentModeIndex === 0)?(
+                            <div onClick={()=>{proceedToPayment()}} className="btn dark_btn">Proceed To Payment</div>
+                        ):(
+                            <div onClick={()=>{placeOrderFn()}} className="btn dark_btn">Place Order</div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -468,9 +403,21 @@ function Checkout(props) {
     )
 
     const integrationJSX = (
-        <div className="checkout-integration-section">
-            Integration
-            <div onClick={ ()=>{payNow()} } className="btn dark_btn">Pay Now</div>
+        <div className="card round-card">
+            <h4 className="center head">Payment</h4>
+            <div className="card-content center">
+                <form onSubmit={payNow}>
+                    <CardElement 
+                    options={{ value: {hidePostalCode: true}}}
+                    onChange={handleCardElementChange} />
+                    <button  className="btn dark_btn" disabled={processing || disabled || succeeded} >
+                        <span>
+                            {(processing ? "Processing" : "Pay Now")}
+                        </span>
+                    </button>
+                </form>
+                <p className="center red-text">{errorLog}</p>
+            </div>
         </div>
     )
     const checkoutResultJSX = (

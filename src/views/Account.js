@@ -45,7 +45,7 @@ function Account(props){
                     </div>
                     </div>
                 </div>
-                <div className="col s12 m6 l6">
+                {/* <div className="col s12 m6 l6">
                     <div className="card round-card">
                     <div className="cart-title"> <h6 className="center primary-green-dark-text">Manage <span className="heavy_text">Payments</span> :</h6> </div>
                     <div className="card-content center">
@@ -54,7 +54,7 @@ function Account(props){
                         </NavLink>
                     </div>
                     </div>
-                </div>
+                </div> */}
                 <div className="col s12 m6 l6">
                     <div className="card round-card">
                     <div className="cart-title"> <h6 className="center primary-green-dark-text">Manage <span className="heavy_text">Orders</span> :</h6> </div>

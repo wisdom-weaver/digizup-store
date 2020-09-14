@@ -236,7 +236,7 @@ function Navbar(props) {
                       <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/account">Dashboard</NavLink></div>
                       <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/account/orders">My Orders</NavLink></div>
                       <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/account/addresses">My Addresses</NavLink></div>
-                      <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/account/payments">Payments</NavLink></div>
+                      {/* <div className="overlayLinkContainer"> <NavLink onClick={()=>{setMenuOpenState(false)}} className="overlayLink" exact to="/account/payments">Payments</NavLink></div> */}
                       
                     </CollapsibleItem>
                     ):(null)}

@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "digizup-store-test1"
+  },
+  "targets": {
+    "digizup-store-test1": {
+      "hosting": {
+        "store": [
+          "digizup-store-test1"
+        ],
+        "console": [
+          "console-digizup-store-test1"
+        ]
+      }
+    }
   }
 }

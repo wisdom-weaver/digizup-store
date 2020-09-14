@@ -10,7 +10,7 @@ function Loading() {
         <div className="card-content">
         <div className="center">
             <div className="logo-container">
-            <img src={logo} alt="" srcset=""/>
+            <img src={logo} alt="" />
             </div>
             <h4 className="center">Loading....</h4>
         </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { withRouter, useHistory, NavLink } from 'react-router-dom'
 import { compose } from 'redux'
-import { useFirestoreConnect } from 'react-redux-firebase';
+import { useFirestoreConnect, isLoaded } from 'react-redux-firebase';
 import { useSelector, connect } from 'react-redux';
 import moment from 'moment';
 import { v1 as uuid } from 'uuid';
@@ -11,6 +11,9 @@ import _ from 'lodash';
 import 'materialize-css';
 import { Modal, Button } from 'react-materialize';
 import { requestCancellationAction } from '../store/actions/orderActions';
+import axios from '../axios/axios'
+import Loading from '../components/Loading';
+import InfoCard from '../components/InfoCard';
 
 function Order(props) {
     // console.log(props)
@@ -28,22 +31,25 @@ function Order(props) {
     }
 
     const {requestCancellationAction} = props;
-    const [cancellationMessage,setCancellationMessage] = useState('its boaring');
-    const requestCancellation = (orderID)=>{
-        console.log('requesting cancellateion', orderID,cancellationMessage);
-        requestCancellationAction(orderID, cancellationMessage);
+    const [cancellationMessage,setCancellationMessage] = useState('');
+    const requestCancellation = async ()=>{
+        console.log('requesting cancellation', orderid,cancellationMessage);
+        return await axios({
+            method: 'post',
+            url: `/requestCancellation?userid=${authuid}&&orderid=${orderid}&&cancellationMessage=${cancellationMessage.split(' ').join('+')}`
+        }).catch(()=>{})
     }
     const cancelButton = (order && order.id) ?(
             <Modal
               actions={[
                   <Fragment>
                     <Button flat modal="close" node="button" waves="green">Close</Button>
-                    <Button flat modal="close" node="button" waves="red" onClick={()=>{requestCancellation(order.id,cancellationMessage)}} >Request Cancellation</Button>
+                    <Button flat modal="close" node="button" waves="red" onClick={()=>{requestCancellation()}} >Request Cancellation</Button>
                 </Fragment>
               ]}
               bottomSheet={false}
               fixedFooter={false}
-              header="Modal Header"
+              header="Cancel Order"
               id="Modal-0"
               open={false}
               options={{
@@ -91,7 +97,6 @@ function Order(props) {
                     <tr><td>Card Number :</td><th>{order.card.cardNo}</th></tr>
                     </Fragment>
                 ) : (null)}
-                    <tr><td>Payment Status :</td><th>{order.paymentType == 'cod' ? 'Payment scheduled at delivery' : 'Paid'}</th></tr>
                 </tbody>
             </table>
         </div>
@@ -118,7 +123,7 @@ function Order(props) {
             <h6 className="center">Order Status: <span className="heavy_text">{order.status}</span></h6>
             {(order.tracking) ? (<table>
                 <tbody>
-                    {order.tracking.map(each => (<tr><td className="line-break">{each.title}</td><td className="no-wrap">{moment(each.updateTime.toDate()).format('MMM Do YY, h:mm a')}</td></tr>))}
+                    {order.tracking.map(each => (<tr key={uuid()}><td className="line-break">{each.title}</td><td className="no-wrap">{moment(each.updateTime.toDate()).format('MMM Do YY, h:mm a')}</td></tr>))}
                 </tbody>
             </table>) : (null)}
             {['Out for Delivery', 'Delivered', 'Cancelled'].includes(order.status)?(null):(
@@ -144,7 +149,7 @@ function Order(props) {
                         <td className="no-wrap heavy_text">Cart Qty</td>
                         <td className="no-wrap heavy_text">SubTotal</td>
                     </tr>
-                    {(order.cart.map(item => (<tr>
+                    {(order.cart.map(item => (<tr key={uuid()} >
                         <td className="text-link" onClick={() => { productRedirect(item); } }>{item.productName}</td>
                         <td className="no-wrap">{priceFormat(item.productPrice)}</td>
                         <td className="no-wrap">{item.cartQty}</td>
@@ -174,29 +179,20 @@ function Order(props) {
     ):(null)
     return (
         <div className="Order Page">
-            <div className="container">
-                <Delayed waitBeforeShow={2000}>
-                {(order && order?.id)?(
-                        <Fragment>
-                            {OrderPageJSX}
-                        </Fragment>
-                ):(
-                    <div className="row">
-                        <div className="col s12 m8 l6 offset-m2 offset-l3">
-                            <div className="card round-card">
-                                <div className="card-content">
-                                    <p>
-                                        No Such Order Found.
-                                        Please Verify your credentials and order id
-                                    </p>
-                                    <NavLink to="/store"> <div className="btn dark_btn">Shop Now</div> </NavLink>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-                </Delayed>
-            </div>
+        <div className="container">
+            {(order)?(
+                OrderPageJSX
+            ):(
+            <Delayed waitBeforeShow={3000}>
+            <InfoCard>
+                <p className="flow-text">
+                    Please verify your order id
+                </p>
+                <NavLink to="/account/orders" className="btn dark_btn">Check Orders</NavLink>
+            </InfoCard>
+            </Delayed>
+            )}
+        </div>
         </div>
     )
 }

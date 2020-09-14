@@ -3,13 +3,13 @@ import { useSelector } from 'react-redux'
 import { compose } from 'redux';
 import { withRouter, NavLink } from 'react-router-dom';
 import _ from 'lodash';
-
+import { v1 as uuid } from 'uuid';
 import logo from '../assets/img/digi-logo.jpg'
 
 function AppFooter(props) {
     const categories = useSelector(state=>state.firestore.ordered.categories ?? []);
     const link= (to,text) => 
-    <div className="footer-btn-container">
+    <div key={uuid()} className="footer-btn-container">
         <NavLink className="btn" exact to={to}>{text}</NavLink>
     </div>
 
