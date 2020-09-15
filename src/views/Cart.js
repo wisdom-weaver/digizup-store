@@ -105,7 +105,6 @@ function Cart(props) {
             <Fragment key={uuid()}>
             <div className="col s9">
                 <p 
-                style={{'lineHeight':'3'}}
                 className="head regular_text center">{each.notificationMessage}</p>
             </div>
             <div className="col s3 center">
