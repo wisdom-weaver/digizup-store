@@ -112,6 +112,7 @@ function Cart(props) {
                  onClick={()=>{deleteNotification(each.id)}}
                  className="btn-floating btn-small red_btn"><i className="material-icons">clear</i></div>
             </div>
+            <div className="col s12"></div>
             </Fragment>
         ))}
         </div>
